@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<description xmlns="http://openoffice.org/extensions/description/2006" xmlns:d="http://openoffice.org/extensions/description/2006"  xmlns:xlink="http://www.w3.org/1999/xlink">
+        <version value="1.3.2" />
+        <identifier value="org.openoffice.lt.hunspell.dictionaries" />
+        <display-name>
+                <name lang="en-US">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="ab">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="af">Litause spellingwoordeboek en koppeltekenreëls</name>
+        <name lang="am">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="ar">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="as">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="ast">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="be">Літоўскі правапісны слоўнік і правілы пераносаў</name>
+        <name lang="bg">Литовски правописен речник и правила за сричкопренасяне</name>
+        <name lang="bn">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="bn-IN">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="bo">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="br">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="brx">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="bs">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="ca">Lituà: corrector ortogràfic i partició de mots</name>
+        <name lang="ca-valencia">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="ckb">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="cs">Slovník kontroly pravopisu, dělení slov a slovník synonym pro litevštinu</name>
+        <name lang="cy">Lithiwaneg - geiriadur sillafu a rheolau cyplysnodi</name>
+        <name lang="da">Litauisk stavekontrolordbog og orddelingsregler</name>
+        <name lang="de">Litauisches Wörterbuch für Rechtschreibprüfung und Silbentrennung</name>
+        <name lang="dgo">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="dsb">Pšawopisny słownik a pšawidła źělenja złožkow litawšćiny</name>
+        <name lang="dz">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="el">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="en-GB">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="en-ZA">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="eo">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="es">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="et">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="eu">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="fa">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="fi">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="fr">Dictionnaire orthographique et règles de césure lituanien</name>
+        <name lang="fur">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="fy">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="ga">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="gd">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="gl">Dicionario ortográfico e regras de guionización do lituano</name>
+        <name lang="gu">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="gug">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="he">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="hi">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="hr">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="hsb">Prawopisny słownik a prawidła dźělenja złóžkow litawšćiny</name>
+        <name lang="hu">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="hy">Լիտվական ուղղագրության բառարան և տողադարձման կանոններ</name>
+        <name lang="id">Kamus ejaan dan aturan pemenggalan kata bahasa Lituania</name>
+        <name lang="is">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="it">Dizionario ortografico lituano e regole di sillabazione</name>
+        <name lang="ja">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="ka">ლიეტუვური მართლწერის ლექსიკონი და გადატანის წესები</name>
+        <name lang="kab">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="kk">Литва тілі үшін емле сөздігі және тасымалдау ережелері</name>
+        <name lang="km">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="kmr-Latn">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="kn">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="ko">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="kok">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="ks">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="lb">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="lo">ວັດຈະນານຸກົມການສະກົດຄຳ ແລະ ກົດການແຍກພະຍາງພາສາລີທົວເນຍ.</name>
+        <name lang="lt">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="lv">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="mai">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="mk">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="ml">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="mn">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="mni">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="mr">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="my">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="nb">Litauisk rettskrivingsordbok og bindestrekregler</name>
+        <name lang="ne">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="nl">Spellings- en afbrekingswoordenboek voor Litouws</name>
+        <name lang="nn">Litauisk stavekontroll og orddelingsreglar</name>
+        <name lang="nr">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="nso">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="oc">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="om">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="or">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="pa-IN">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="pl">Litewski słownik ortograficzny i reguły dzielenia wyrazów</name>
+        <name lang="pt">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="pt-BR">Dicionario ortográfico e regras de hifenização em lituano</name>
+        <name lang="qtz">w2SR3‖Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="ro">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="ru">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="rw">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="sa-IN">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="sat">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="sat-Olck">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="sd">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="si">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="sid">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="sk">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="sl">Litovski jezik – slovar za preverjanje črkovanja in vzorci za deljenje besed</name>
+        <name lang="sq">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="sr">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="sr-Latn">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="ss">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="st">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="sv">Litauisk stavningsordbok och avstavningsregler</name>
+        <name lang="sw-TZ">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="szl">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="ta">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="te">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="tg">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="th">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="tl">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="tn">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="tr">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="ts">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="tt">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="ug">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="uk">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="uz">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="ve">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="vec">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="vi">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="xh">Lithuanian spelling dictionary and hyphenation rules</name>
+        <name lang="zh-CN">立陶宛语拼写词典与断词规则</name>
+        <name lang="zh-TW">立陶宛文拼寫詞典與斷字與禁忌規則</name>
+        <name lang="zu">Lithuanian spelling dictionary and hyphenation rules</name>
+                <name lang="lt">Lietuvių kalbos rašybos tikrinimo žodynas ir skiemenavimo taisyklės</name>
+        </display-name>
+        <platform value="all" />
+                <dependencies>
+                        <OpenOffice.org-minimal-version value="3.0" d:name="OpenOffice.org 3.0" />
+                </dependencies>
+         <publisher>
+                 <name xlink:href="https://github.com/ispell-lt/ispell-lt" lang="en-US">Albertas Agejevas and contributors</name>
+                 <name xlink:href="https://github.com/ispell-lt/ispell-lt" lang="lt">Albertas Agejevas ir bendradarbiai</name>
+        </publisher>
+        <registration>
+                <simple-license accept-by="admin" suppress-on-update="true" >
+                        <license-text xlink:href="COPYING" lang="en-US" />
+                </simple-license>
+        </registration>
+</description>
+

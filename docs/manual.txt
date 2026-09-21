@@ -1,0 +1,119 @@
+Consulte hospedagem.md para instalacao e migracao.
+
+TVMax — INSTALAÇÃO
+
+REQUISITOS
+- PHP 8.1+ com proc_open habilitado.
+- Extensões fileinfo, mbstring, zip e pdo_sqlite habilitadas.
+- Pastas data/ e uploads/ com permissão de escrita pelo PHP.
+
+INSTALAÇÃO
+1. Envie os arquivos indicados em hospedagem.md para public_html (ou uma subpasta).
+2. Copie config/local.example.php para config/local.php e troque ADMIN_PASSWORD (chave de configuração inicial).
+3. Garanta permissão de escrita nas pastas data/ e uploads/.
+4. Abra index.php.
+5. Abra apresentador.php e use Primeiro admin para criar sua conta, informando a chave de configuração. Depois entre com e-mail e senha.
+6. Na TV, abra visualizador.php e pressione o botão ⛶ para tela cheia.
+
+COMO USAR
+- “Arquivo”: imagens, MP4/WebM, áudio, PDF, XLS/XLSX, PPT/PPTX/PPS/PPSX e ODP/ODS.
+- “Texto”: cria uma tela tipográfica.
+- Dê duplo clique em um item da fila para colocá-lo no ar imediatamente.
+- Arraste itens para reordenar.
+- Tempo: segundos por página; em imagens, textos e vídeos, segundos por item.
+- Delay: pausa entre esse item e o próximo.
+- Início/Fim: janela em que o conteúdo pode aparecer.
+- ⏮ / ▶ / Ⅱ / ⏭: controle ao vivo.
+- Aguardar: pausa a apresentação e mostra a tela de espera. Voltar restaura o estado anterior; Reproduzir sai da espera e retoma.
+- Configurações alteram volume, relógio, progresso, ajuste, transição e fundo.
+
+OBSERVAÇÕES IMPORTANTES
+- O visualizador consulta o servidor aproximadamente a cada 0,3 s; funciona em hospedagem PHP comum sem WebSocket.
+- Vídeos grandes dependem do limite upload_max_filesize/post_max_size do servidor, além do limite do sistema.
+- Navegadores/TVs podem bloquear autoplay com áudio. Se isso ocorrer, interaja uma vez com a página da TV.
+- Para uso público, mantenha a senha forte e HTTPS ativo.
+
+APRESENTACOES E SINCRONIZACAO
+- Abra o MESMO servidor em todos os dispositivos, por exemplo http://IP-DO-SERVIDOR/visualizador.php.
+- Nao use localhost em outras TVs/celulares: localhost aponta para o proprio aparelho.
+- O servidor define item, pagina, posicao, pausa e tela de espera. Telas que entram depois acompanham o ponto atual.
+- O navegador estima o horario do servidor e corrige a posicao de audio/video; o relogio local nao define a reproducao.
+- A sincronizacao nao e frame-perfect: rede, carregamento de midia e navegadores suspensos ainda podem introduzir pequenos atrasos. Ao reconectar, a tela se realinha.
+- PDF e documentos Office sao convertidos no upload em imagens PNG de 3840 pixels no maior lado (acima de Full HD, sem compressao com perdas), com limite de 300 paginas.
+- XLS/XLSX usam as paginas de impressao de cada planilha; ajuste area de impressao, orientacao e escala no arquivo original.
+- Slides sao exibidos como paginas estaticas. Animacoes, transicoes internas e videos incorporados nao sao reproduzidos.
+- O tempo da fila vale para CADA pagina. O intervalo vale somente apos a ultima pagina do arquivo.
+- Anterior/Proximo percorrem as paginas; ao atingir a borda, passam ao arquivo anterior/seguinte. A pausa permanece ativa.
+- PDFs antigos na fila sao preparados ao clicar no botao de reproducao do item.
+- O indicador do painel confirma o estado salvo no servidor; nao representa confirmacao de recebimento de cada TV.
+
+CONVERSOR NO SERVIDOR
+- Nesta maquina, LibreOffice foi extraido em .runtime/LibreOffice e PyMuPDF em .runtime/python.
+- Python e detectado pelo PATH (python no Windows, python3 no Linux).
+- Para outra instalacao, configure TVMAX_PYTHON com o caminho do Python e TVMAX_SOFFICE com o caminho do soffice.com (Windows) ou soffice (Linux).
+- Instale PyMuPDF 1.28.2 no Python do servidor ou na pasta .runtime/python. A pasta local e especifica para Windows x64.
+- Instale LibreOffice no servidor ou leve a pasta .runtime/LibreOffice completa para um Windows compativel.
+- A conta do PHP precisa executar o Python/LibreOffice e escrever em uploads, data e .runtime/profiles.
+- Nao remova os arquivos .htaccess que protegem data, scripts e .runtime.
+- A conversao e local; os documentos nao sao enviados a servicos externos.
+- Respeite as licencas incluidas nas dependencias ao redistribuir a aplicacao.
+
+TESTES
+node tests/viewer.test.cjs
+node tests/ui-state.test.cjs
+node tests/sync.test.cjs
+node tests/parity.test.cjs
+python tests/integration.py
+- O teste de integracao usa uma copia temporaria e nao modifica data/state.json da aplicacao.
+
+AJUSTE DA MIDIA
+- Ajustar a largura: usa toda a largura e preserva a proporcao; pode cortar o excesso vertical.
+- Ajustar a altura: usa toda a altura e preserva a proporcao; pode cortar o excesso horizontal.
+- Ajustar a tela: mostra a imagem, video ou pagina inteira, sem distorcer e sem cortar. Pode deixar bordas.
+- O ajuste se recalcula ao girar o celular, redimensionar a janela ou entrar em tela cheia.
+- Configuracoes antigas de preenchimento sao tratadas como Ajustar a tela.
+- Textos se reduzem automaticamente para caber; as areas seguras de celulares sao respeitadas.
+- O controle principal e um unico botao: mostra Pausar durante a reproducao e Reproduzir quando pausado.
+- Aguardar congela tambem o audio, video e a posicao da pagina em todas as telas.
+- Ao clicar em Voltar, retoma se estava reproduzindo antes da espera; se ja estava pausado, continua pausado.
+- Reproduzir ou selecionar um item sai da espera e inicia a reproducao.
+node tests/media-layout.test.cjs
+
+FILA E ARQUIVADOS
+- Os itens permanecem na fila depois de tocar e a fila repete automaticamente.
+- Avancar, voltar ou selecionar outro item nao arquiva nenhum conteudo.
+- Apenas a validade vencida ou o botao Remover envia um item para Arquivados.
+- Remover nao apaga arquivos: preserva original, paginas, tempo e configuracoes.
+- Recuperar coloca o item ao final da fila. Uma data de fim ja vencida e limpa para evitar novo arquivamento imediato.
+- Arquivados indicam Validade encerrada ou Arquivado manualmente.
+- A migracao devolve para a fila os itens arquivados pela antiga regra de conclusao; remocoes manuais sao mantidas.
+- Fila e arquivados tem rolagem propria; em janelas baixas, a pagina tambem pode rolar sem cortar os controles.
+
+QUALIDADE E TRANSICOES
+- Documentos sao renderizados acima de Full HD para manter o texto nitido no ajuste a uma TV 1080p.
+- Fotos e videos usam os arquivos originais. Aumentar a resolucao nao recupera detalhes ausentes de um original de baixa qualidade.
+- Apresentacoes antigas podem ser regeneradas pelo botao Melhorar qualidade, preservando originais e arquivamento.
+- A duracao da transicao pode ser ajustada de 0 a 2000 ms. Sem efeito faz a troca direta.
+- A proxima imagem ou video carrega antes da troca; durante carregamento lento, a imagem anterior permanece visivel.
+- Fade, deslizar e zoom terminam sem transformacao residual, evitando texto permanentemente borrado.
+- tests/queue.php verifica a repeticao, a validade e a preservacao dos itens.
+
+CONTAS, APROVACAO E AUDITORIA
+- A senha compartilhada antiga deixa de ser um login. ADMIN_PASSWORD e usada apenas para criar o PRIMEIRO administrador.
+- Cadastros comuns sempre recebem cargo Operador e situacao Pendente. Ninguem e aprovado automaticamente.
+- Em Usuarios e logs, um administrador pode aprovar, recusar, suspender e alterar cargos.
+- Operadores aprovados controlam a apresentacao, enviam arquivos e organizam a fila. Somente administradores consultam usuarios e logs.
+- O ultimo administrador ativo nao pode ser suspenso ou rebaixado.
+- Suspender um usuario bloqueia novas operacoes de sessoes que ja estavam abertas.
+- Uploads e textos novos guardam o ID e o nome do autor no servidor. O cliente nao pode escolher outro autor.
+- Conteudos anteriores ao sistema de contas mostram Autor nao registrado: nao e possivel descobrir retroativamente quem os enviou.
+- Contas, hashes de senhas e auditoria ficam em data/accounts.sqlite, protegido pelo .htaccess de data. Preserve tambem os arquivos auxiliares SQLite ao fazer backup com o sistema em uso, ou use a ferramenta de backup do SQLite.
+- Sao registrados cadastro, login, logout, falhas, aprovacoes, recusas, cargos, uploads, textos, configuracoes, ordem e edicoes da fila, comandos, selecao, arquivamento, recuperacao, qualidade e vencimento automatico.
+- Alteracoes incluem valores anteriores e novos, autor, horario, IP, resultado e identificador do conteudo quando aplicavel.
+- Pesquisas, abertura das abas/modal/upload e eventos de tela cheia/exibicao informados pelo visualizador aparecem como eventos de interface (client), separados dos registros efetivos do servidor.
+- TVs sem uma conta conectada aparecem como Visitante, com IP. Acoes automaticas aparecem como Sistema.
+- Senhas, hashes, tokens e chaves de configuracao NAO entram nos logs.
+- As consultas automaticas de sincronizacao a cada 300 ms nao geram uma linha por consulta. Aberturas, exibicoes e acoes relevantes sao registradas.
+- O historico comeca nesta versao. Eventos anteriores nao podem ser reconstruidos.
+- Nao ha exclusao de logs pela interface. Busca por usuario e texto e paginacao estao disponiveis na administracao.
+- Tests: python tests/integration.py --auth-only verifica contas, permissoes, autoria e auditoria; --queue-only verifica a fila usando uma conta de teste.

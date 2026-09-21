@@ -1,0 +1,37 @@
+{
+    "version": 6,
+    "updatedAt": 1789973335,
+    "screen": {
+        "enabled": true,
+        "background": "#050816",
+        "fit": "contain",
+        "showClock": false,
+        "showProgress": false,
+        "transition": "fade",
+        "transitionMs": 650,
+        "volume": 70,
+        "muted": false
+    },
+    "playback": {
+        "mode": "auto",
+        "currentId": null,
+        "command": "blackout",
+        "commandNonce": 3,
+        "startedAt": 1789973156,
+        "paused": true,
+        "blackout": true,
+        "reloadNonce": 0,
+        "offsetMs": 0,
+        "page": 0,
+        "pageCount": 0,
+        "inDelay": false,
+        "anchorId": null,
+        "anchorAtMs": 1789973335506.898,
+        "resumeAfterStandby": true
+    },
+    "queue": {
+        "autoArchive": false,
+        "archivePolicy": "validity_manual"
+    },
+    "items": []
+}

@@ -1,0 +1,16 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const timeline=require('../assets/timeline.js');
+const state={items:[{id:'a',enabled:true,type:'presentation',duration:2,delay:1,pages:['1','2','3']},{id:'b',enabled:true,type:'video',duration:5,delay:0}],playback:{anchorId:'a',anchorAtMs:100000,offsetMs:0,paused:false}};
+const a=timeline.resolve(state,104500);
+assert.equal(a.item.id,'a');assert.equal(a.page,2);assert.equal(a.pageOffsetMs,500);
+const snapshot=structuredClone(state);snapshot.playback={...state.playback,anchorAtMs:104500,offsetMs:4500};
+for(const now of [104500,106500,107000,112000,100000000])assert.deepEqual(timeline.resolve(state,now),timeline.resolve(snapshot,now),'Late clients must match the original timeline');
+assert.equal(timeline.resolve(state,106500).inDelay,true);
+state.playback.paused=true;state.playback.offsetMs=4500;
+assert.deepEqual(timeline.resolve(state,104500),timeline.resolve(state,999999999),'Pause must remain frozen for every client');
+state.items=[];assert.equal(timeline.resolve(state,999999).item,null);
+console.log('PASS shared timeline: late joins, pages, loops, delay and pause');
+const queue={queue:{autoArchive:true},items:[{id:'a',enabled:true,type:'text',duration:2},{id:'b',enabled:true,type:'text',duration:2}],playback:{anchorId:'a',anchorAtMs:1000,offsetMs:0,paused:false}};
+assert.equal(timeline.resolve(queue,5000).item.id,'a','Completed queue repeats even with an old autoArchive setting');
+queue.items[0].archivedAt=2000;queue.playback.anchorId='b';queue.playback.anchorAtMs=3000;
+assert.equal(timeline.resolve(queue,3500).item.id,'b','Archived content is excluded from playback');

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<description xmlns="http://openoffice.org/extensions/description/2006" xmlns:d="http://openoffice.org/extensions/description/2006"  xmlns:xlink="http://www.w3.org/1999/xlink">
+    <identifier value="org.openoffice.nl.hunspell.dictionaries" />
+    <platform value="all" />
+    <version value="2.20.21" />
+    <dependencies>
+        <OpenOffice.org-minimal-version value="3.2" d:name="OpenOffice.org 3.2" />
+    </dependencies>
+    <display-name>
+        <name lang="en-US">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="ab">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="af">Nederlandse speltoetserwoordeboek en koppeltekenpatrone</name>
+        <name lang="am">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="ar">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="as">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="ast">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="be">Слоўнік праверкі правапісу і правілы пераносу слоў для нідэрландскай мовы</name>
+        <name lang="bg">Нидерландски правописен речник и правила за сричкопренасяне</name>
+        <name lang="bn">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="bn-IN">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="bo">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="br">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="brx">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="bs">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="ca">Neerlandès: corrector ortogràfic i patrons de partició de mots</name>
+        <name lang="ca-valencia">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="ckb">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="cs">Slovník kontroly pravopisu a dělení slov pro nizozemštinu</name>
+        <name lang="cy">Isalmaeneg- geiriadur sillafu a rheolau cyplysnodi</name>
+        <name lang="da">Hollandsk stavekontrol-ordbog og orddelingsmønstre</name>
+        <name lang="de">Niederländisches Wörterbuch für Rechtschreibprüfung und Silbentrennung</name>
+        <name lang="dgo">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="dsb">Pšawopisny słownik a mustry źělenja złožkow za nižozemšćinu</name>
+        <name lang="dz">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="el">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="en-GB">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="en-ZA">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="eo">Nederlandaj literuma vortaro kaj vortdividaj reguloj</name>
+        <name lang="es">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="et">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="eu">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="fa">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="fi">Hollannin oikolukusanasto ja tavutus</name>
+        <name lang="fr">Dictionnaire de vérification orthographique et règles de césure néerlandais</name>
+        <name lang="fur">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="fy">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="ga">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="gd">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="gl">Dicionario ortográfico e padróns de guionización do holandés</name>
+        <name lang="gu">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="gug">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="he">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="hi">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="hr">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="hsb">Prawopisny słownik a mustry dźělenja złóžkow za nižozemšćinu</name>
+        <name lang="hu">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="hy">Հոլանդերենի ուղղագրության ստուգիչ բառարան և տողադարձի նախշեր</name>
+        <name lang="id">Kamus pemeriksa ejaan bahasa Belanda dan pola pemenggalan kata</name>
+        <name lang="is">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="it">Dizionario di correzione ortografica e modelli di sillabazione per l'olandese</name>
+        <name lang="ja">オランダ語スペル辞書とハイフネーション規則</name>
+        <name lang="ka">ნიდერლანდური მართლწერის შემოწმების ლექსიკონი და გადატანის წესები</name>
+        <name lang="kab">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="kk">Голланд тілі үшін емле сөздігі және тасымалдау үлгілері</name>
+        <name lang="km">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="kmr-Latn">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="kn">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="ko">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="kok">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="ks">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="lb">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="lo">ວັດຈະນານຸກົມກວດສອບການສະກົດຄຳ ແລະ ຮູບແບບການແຍກພະຍາງພາສາດັດ.</name>
+        <name lang="lt">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="lv">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="mai">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="mk">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="ml">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="mn">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="mni">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="mr">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="my">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="nb">Nederlandsk stavekontrollordbok og bindestrekmønstre</name>
+        <name lang="ne">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="nl">Nederlands woordenboek en afbreekpatronen</name>
+        <name lang="nn">Hollandsk stavekontroll, ordbok og orddelingsmønster</name>
+        <name lang="nr">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="nso">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="oc">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="om">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="or">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="pa-IN">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="pl">Holenderski słownik ortograficzny i reguły dzielenia wyrazów</name>
+        <name lang="pt">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="pt-BR">Dicionário ortográfico e padrões de hifenização em holandês.</name>
+        <name lang="qtz">Ta9Cm‖Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="ro">Dicționar de verificare ortografică olandeză și modele de cratime</name>
+        <name lang="ru">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="rw">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="sa-IN">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="sat">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="sat-Olck">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="sd">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="si">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="sid">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="sk">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="sl">Nizozemski jezik – slovar za preverjanje črkovanja in vzorci za deljenje besed</name>
+        <name lang="sq">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="sr">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="sr-Latn">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="ss">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="st">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="sv">Holländsk stavningskontrollordbok och avstavningsmönster</name>
+        <name lang="sw-TZ">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="szl">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="ta">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="te">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="tg">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="th">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="tl">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="tn">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="tr">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="ts">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="tt">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="ug">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="uk">Словник для перевірки правопису голландської мови та правила розбиття слів на склади</name>
+        <name lang="uz">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="ve">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="vec">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="vi">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="xh">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="zh-CN">荷兰语拼写词典与断词规则</name>
+        <name lang="zh-TW">荷蘭語拼寫檢查詞典與斷字處理規則</name>
+        <name lang="zu">Dutch spelling checker dictionary and hyphenation patterns</name>
+        <name lang="nl">Nederlandstalige spellingcontrole en afbreekpatronen</name>
+    </display-name>
+    <icon>
+        <default xlink:href="opentaal-logo.png" />
+    </icon>
+    <publisher>
+        <name xlink:href="https://opentaal.org/opentaal/english" lang="en-US">OpenTaal</name>
+        <name xlink:href="https://opentaal.org" lang="nl">OpenTaal</name>
+    </publisher>
+</description>
