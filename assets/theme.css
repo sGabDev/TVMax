@@ -1,5 +1,6 @@
 /* TVMax identity and responsive application surfaces. Projection geometry lives in app.css. */
 :root{color-scheme:dark;--canvas:#080f19;--surface:#101c2b;--line:#253448;--muted:#a0b1c6;--accent:#5eead4;--ink:#edf5ff}
+.audio-help{position:absolute;z-index:61;bottom:14px;left:50%;transform:translateX(-50%);width:min(500px,80%);text-align:center;font-size:12px;color:#dce9f5;background:#081421dc;border-radius:8px;padding:6px 10px;pointer-events:none}.audio-help[hidden]{display:none}.viewer .media-enable{bottom:70px;white-space:normal;min-height:48px}
 .standby-logo{width:clamp(56px,12vmin,120px);height:auto;margin-bottom:24px}
 body{color:var(--ink);font-family:Segoe UI,system-ui,sans-serif}
 .dashboard,.admin-page{background:var(--canvas)}
@@ -39,3 +40,15 @@ body.dashboard.presenter-ready{height:auto;min-height:100dvh;overflow:auto}
 .archive-pagination{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:20px;padding-top:16px;font-size:13px;color:var(--muted)}
 .archive-pagination[hidden]{display:none}.archive-pagination label{display:flex;align-items:center;gap:10px}.archive-pagination select{width:auto}
 @media(max-width:640px){#archiveList{grid-template-columns:1fr}.archive-pagination{align-items:flex-start;flex-direction:column}}
+#presentationPanel{display:flex;flex-direction:column;flex:1;min-height:0}
+#presentationPanel[hidden],#smartthingsPanel[hidden]{display:none!important}
+.shell>.account-tabs{flex:none;margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap}
+.shell>.account-tabs [aria-pressed=true]{border-color:var(--accent);color:var(--accent)}
+#smartthingsPanel{overflow-y:auto;min-height:0;padding-bottom:20px}
+.st-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:16px;margin:22px 0}
+.st-card{border:1px solid var(--line);border-radius:14px;padding:18px;background:#101d2d;overflow-wrap:anywhere}
+.st-card h2{margin:0 0 14px}.st-card .panel-actions{flex-wrap:wrap}
+.st-badge{display:inline-block;padding:5px 10px;border-radius:20px;background:#26354a;color:#c6d3e4;font-size:13px}
+.st-on{background:#174330;color:#91e9b8}.st-off{background:#233b57;color:#b5d5ff}.st-offline,.st-error{background:#50232e;color:#ffb0b0}
+.st-settings{margin-top:18px}.st-settings summary{cursor:pointer;font-size:18px;font-weight:600}.st-settings form{max-width:720px;margin-top:20px}.st-settings hr{border:0;border-top:1px solid var(--line);margin:24px 0}.st-settings a{color:var(--accent)}
+#stMessage{line-height:1.6;overflow-wrap:anywhere}

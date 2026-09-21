@@ -302,8 +302,10 @@ O painel também controla volume geral, silenciamento, relógio, barra de progre
 
 1. Abra `visualizador.php` em cada dispositivo, na mesma instalação.
 2. Acione o botão de tela cheia.
-3. Se necessário, clique em **Ativar reprodução de áudio/vídeo**.
+3. Clique em **Habilitar áudio nesta tela**, mesmo que a fila ainda esteja vazia. A ativação vale para esta abertura do visualizador; após recarregar, ative novamente.
 4. Mantenha a página ativa e a conexão disponível.
+
+O botão aparece também durante pausa e tela de espera. A ativação prepara os players para os próximos conteúdos, respeitando volume, silenciamento e pausa definidos no apresentador. Se o navegador bloquear a reprodução, o botão continua disponível para nova tentativa. Antes da ativação, a reprodução automática permanece sem som.
 
 Autoplay com som e tela cheia podem exigir interação. Dispositivos diferentes podem suportar codecs diferentes, mesmo com a mesma extensão de arquivo.
 

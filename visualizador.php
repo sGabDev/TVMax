@@ -13,7 +13,8 @@
   </div>
  </div>
  <div id="viewerNotice" class="viewer-notice" role="status" hidden></div>
- <button id="enableMedia" class="btn media-enable" hidden>Ativar reprodução de áudio/vídeo</button>
+ <button id="enableMedia" class="btn primary media-enable" aria-describedby="audioHelp">Habilitar áudio nesta tela</button>
+ <span id="audioHelp" class="audio-help">Toque para preparar o som, mesmo sem conteúdo na fila.</span>
  <div id="clock" class="viewer-clock"></div>
  <div id="progressWrap" class="progress-wrap"><div id="progress"></div></div>
  <button id="fsBtn" class="fs-btn" title="Tela cheia">⛶</button>

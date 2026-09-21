@@ -11,6 +11,9 @@
  <div class="top-actions"><span class="session-name"><?=htmlspecialchars($user['name'],ENT_QUOTES,'UTF-8')?></span><?php if($user['role']==='admin'): ?><a class="btn small" href="administracao.php">Usuários e logs</a><?php endif; ?><a class="btn small" id="openViewer" href="visualizador.php" target="_blank" rel="noopener">Abrir TV ↗</a><button class="btn small" id="logout">Sair</button></div>
 </header>
 <main class="shell">
+ <div class="account-tabs" role="group" aria-label="Área do apresentador"><button class="btn" id="presentationTab" aria-pressed="true">Apresentação</button><button class="btn" id="smartthingsTab" aria-pressed="false">TVs · SmartThings</button></div>
+ <?php require __DIR__.'/app/views/smartthings.php'; ?>
+ <div id="presentationPanel">
  <section class="hero-panel">
   <div><span class="eyebrow">CONTROLE AO VIVO</span><h1>Apresentação da TV</h1><p id="playbackStatus" class="playback-status" role="status">Conectando...</p><p id="commandStatus" class="hint" role="status" aria-live="polite"></p><p id="nowLabel">Carregando programação...</p></div>
   <div class="transport">
@@ -53,6 +56,7 @@
    <button class="btn wide" data-cmd="reload">↻ Recarregar visualizador</button>
   </aside>
  </div>
+ </div>
 </main>
 
 <div class="modal" id="textModal"><div class="modal-card"><button class="modal-x">×</button><h2>Novo texto</h2>
@@ -65,4 +69,5 @@
 <script src="assets/timeline.js?v=<?=filemtime(__DIR__.'/assets/timeline.js')?>"></script>
 <script src="assets/sync.js?v=<?=filemtime(__DIR__.'/assets/sync.js')?>"></script>
 <script src="assets/presenter.js?v=<?=filemtime(__DIR__.'/assets/presenter.js')?>"></script>
+<script src="assets/smartthings.js?v=<?=filemtime(__DIR__.'/assets/smartthings.js')?>"></script>
 <?php endif; ?></body></html>

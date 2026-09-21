@@ -34,6 +34,29 @@ assert.equal(viewer.document.querySelector('#blackout').attrs['aria-hidden'],'fa
 assert.equal(viewer.document.querySelector('#blackout').classList.contains('on'),true);
 assert.equal(viewer.document.querySelector('#progressWrap').style.display,'none');
 console.log('PASS viewer layers and presenter play/pause/blackout indicators');
+(async()=>{
+ const env=environment(),players=[];let blocked=false;
+ env.document.createElement=tag=>{const el=new Element(tag);if(['video','audio'].includes(tag)){
+  el.getAttribute=key=>key==='src'?el.src:el.attrs[key];el.calls=0;
+  el.play=()=>{el.calls++;return blocked?Promise.reject(Object.assign(new Error('blocked'),{name:'NotAllowedError'})):Promise.resolve()};players.push(el);
+ }return el};
+ for(const name of ['#layerA','#layerB'])env.document.querySelector(name).contains=el=>env.document.querySelector(name).children.includes(el);
+ vm.runInContext(fs.readFileSync('assets/viewer.js','utf8'),env.context);
+ assert.equal(env.document.querySelector('#enableMedia').hidden,false,'Audio activation is visible without state or content');
+ blocked=true;await env.document.querySelector('#enableMedia').onclick();
+ assert.equal(env.document.querySelector('#enableMedia').hidden,false,'Permission rejection must retain the activation button');
+ assert.equal(env.document.querySelector('#enableMedia').disabled,false,'Activation can be retried');
+ blocked=false;await env.document.querySelector('#enableMedia').onclick();
+ assert.equal(players.length,4,'Reuse the two video and two audio players on retry');
+ assert.ok(players.every(el=>el.calls===2&&el.paused),'Prime and pause all players without content');
+ assert.equal(env.document.querySelector('#enableMedia').hidden,true);
+ assert.equal(env.document.querySelector('#audioHelp').hidden,true);
+ env.run('audioEnabled=false');env.run(`sync.onState(${JSON.stringify({...state,items:[],playback:{...state.playback,paused:true,blackout:true}})})`);
+ assert.equal(env.document.querySelector('#enableMedia').hidden,false,'Standby must not hide audio activation');
+ await env.document.querySelector('#enableMedia').onclick();
+ assert.ok(players.every(el=>el.paused),'Activating during standby must not start the presentation');
+ console.log('PASS audio activation without media, permission failure/retry, player reuse and standby');
+})().catch(error=>{console.error(error);process.exitCode=1});
 {
  const env=environment();vm.runInContext(fs.readFileSync('assets/presenter.js','utf8'),env.context);
  const cards=Array.from({length:25},(_,i)=>({dataset:{title:'archive '+i},hidden:false}));
