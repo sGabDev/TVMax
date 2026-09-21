@@ -1,5 +1,7 @@
 # TVMax
 
+Configuração das TVs e credenciais OAuth: [SmartThings, callback e webhook](docs/smartthings.md).
+
 Sistema de programação e apresentação de conteúdo para TVs, monitores, computadores e celulares, controlado pelo navegador. O apresentador organiza a fila e envia comandos; os visualizadores acompanham a programação do mesmo servidor.
 
 O projeto usa PHP, JavaScript e CSS, sem compilação do frontend. A programação fica em JSON; contas e auditoria usam SQLite. Python e LibreOffice são necessários para converter novos documentos em páginas de apresentação.

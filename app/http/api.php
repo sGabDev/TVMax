@@ -10,11 +10,11 @@ if ($action === 'state') {
 }
 auth_routes($action);
 $actor=require_user();require_csrf();
-session_write_close();
 if(str_starts_with($action,'smartthings_')) {
     require_once APP_ROOT.'/app/smartthings.php';
     smartthings_routes($action);
 }
+session_write_close();
 require_once APP_ROOT.'/app/documents.php';
 $GLOBALS['auditAction']=['save'=>'presentation.edit','upload'=>'presentation.upload','add_text'=>'presentation.text','archive'=>'presentation.archive','delete'=>'presentation.archive','restore'=>'presentation.restore','prepare'=>'presentation.quality','select'=>'playback.select'][$action]??('presentation.'.$action);
 
