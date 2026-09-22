@@ -2,6 +2,7 @@
 
 Configuração das TVs e credenciais OAuth: [SmartThings, callback e webhook](docs/smartthings.md).
 Horários de ligar/desligar com o navegador fechado: [Agendamento automático das TVs](docs/agendamento-tvs.md).
+Antes de atualizar a Hostinger: [Preservar usuários, configurações e uploads no deploy](docs/deploy-sem-perder-dados.md).
 
 Sistema de programação e apresentação de conteúdo para TVs, monitores, computadores e celulares, controlado pelo navegador. O apresentador organiza a fila e envia comandos; os visualizadores acompanham a programação do mesmo servidor.
 

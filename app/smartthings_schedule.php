@@ -49,7 +49,7 @@ function st_schedule_due(array $s,int $now): ?array {
     }
     usort($events,fn($a,$b)=>$b['due']<=>$a['due']);return $events[0]??null;
 }
-function st_scheduler_run(?callable $send=null,?int $now=null): array {
+function st_scheduler_run(?callable $send=null,?int $now=null,?float $deadline=null): array {
     $db=st_schedule_db();$lock=fopen(APP_ROOT.'/data/smartthings-scheduler.lock','c');
     if(!$lock)throw new RuntimeException('Não foi possível abrir o bloqueio do agendador.');
     if(!flock($lock,LOCK_EX|LOCK_NB)){fclose($lock);return ['sent'=>0,'failed'=>0,'busy'=>true];}
@@ -58,6 +58,7 @@ function st_scheduler_run(?callable $send=null,?int $now=null): array {
         $stamp=$now??time();$q=$db->prepare('INSERT OR REPLACE INTO smartthings_scheduler(id,heartbeat) VALUES(1,?)');$q->execute([$stamp]);
         $rows=$db->query('SELECT s.*,t.name,t.device_id,t.token FROM smartthings_schedules s JOIN smartthings_tvs t ON t.id=s.tv_id WHERE s.enabled=1')->fetchAll();
         foreach($rows as $s){
+            if($deadline!==null&&microtime(true)>$deadline)break;
             $tick=$now??time();$event=st_schedule_due($s,$tick);if(!$event)continue;
             $q=$db->prepare('SELECT * FROM smartthings_schedule_runs WHERE event_key=?');$q->execute([$event['key']]);$run=$q->fetch();
             if($run&&($run['outcome']==='sent'||$run['attempts']>=3||$tick-$run['attempted_at']<60))continue;

@@ -42,7 +42,7 @@
   el('stConfirmWebhook').hidden=!c.confirmationUrl;
   if(c.confirmationUrl)el('stConfirmWebhook').href=c.confirmationUrl;else el('stConfirmWebhook').removeAttribute('href');
  }
- async function load(){const data=await request('config');tvs=data.tvs;schedules=data.schedules||[];scheduleHealth(data.scheduler);loaded=true;if(el('stTokenState'))el('stTokenState').textContent=data.hasToken?'— configurado':'— não configurado';showOAuth(data.oauth);if(!tvs.length&&el('stConfiguration'))el('stConfiguration').open=true;render();}
+ async function load(){const data=await request('config');tvs=data.tvs;schedules=data.schedules||[];scheduleHealth(data.scheduler);loaded=true;if(el('stTokenState'))el('stTokenState').textContent=data.hasToken?'— configurado':'— não configurado';showOAuth(data.oauth);if(el('stCronCommand')&&data.cronKey){const url=new URL('smartthings-cron.php',location.href);url.searchParams.set('key',data.cronKey);el('stCronCommand').value='wget -q -O /dev/null '+JSON.stringify(url.href);}if(!tvs.length&&el('stConfiguration'))el('stConfiguration').open=true;render();}
  function editSchedule(tv){
   const s=schedules.find(s=>s.tv_id===tv.id);el('stSchedulePanel').hidden=false;el('stScheduleTitle').textContent='Horários · '+tv.name;el('stScheduleId').value=tv.id;
   el('stScheduleEnabled').checked=s?!!Number(s.enabled):true;el('stOnTime').value=s?.on_time||'';el('stOffTime').value=s?.off_time||'';

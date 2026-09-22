@@ -69,11 +69,12 @@ function smartthings_routes(string $action): never {
     if(in_array($action,['smartthings_oauth_save','smartthings_oauth_disconnect'],true))st_oauth_routes($action);
     $db=st_db();
     require_once __DIR__.'/smartthings_schedule.php';
+    require_once __DIR__.'/smartthings_cron.php';
     st_schedule_db();
     if($action==='smartthings_schedule_save')st_schedule_save_route();
     if($action==='smartthings_config') {
         $tvs=$db->query('SELECT * FROM smartthings_tvs ORDER BY name')->fetchAll();
-        json_response(['ok'=>true,'tvs'=>array_map('st_public_tv',$tvs),'hasToken'=>(bool)$db->query('SELECT token FROM smartthings_config WHERE id=1')->fetchColumn(),'canConfigure'=>is_admin(),'schedules'=>st_schedule_list(),'scheduler'=>st_scheduler_health(),'oauth'=>is_admin()?st_oauth_public(st_oauth_read()):null]);
+        json_response(['ok'=>true,'tvs'=>array_map('st_public_tv',$tvs),'hasToken'=>(bool)$db->query('SELECT token FROM smartthings_config WHERE id=1')->fetchColumn(),'canConfigure'=>is_admin(),'schedules'=>st_schedule_list(),'scheduler'=>st_scheduler_health(),'cronKey'=>is_admin()?st_cron_key(true):null,'oauth'=>is_admin()?st_oauth_public(st_oauth_read()):null]);
     }
     if(in_array($action,['smartthings_save','smartthings_delete','smartthings_token'],true)) {
         require_admin();

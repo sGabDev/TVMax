@@ -28,7 +28,23 @@ Cadastre no cron da conta que tem acesso à pasta `data/` (ajuste os caminhos):
 * * * * * /usr/bin/php /caminho/tvmax/scripts/smartthings_scheduler.php >> /caminho/privado/tvmax-scheduler.log 2>&1
 ```
 
-O log deve ficar fora de uma pasta pública. Hospedagens precisam oferecer cron com PHP CLI; este script não tem endpoint HTTP público.
+O log deve ficar fora de uma pasta pública. Esse modo exige PHP CLI. Para cron via `wget`, use a alternativa abaixo.
+
+### Hostinger com wget (HTTP)
+
+Não use a URL `/scripts/smartthings_scheduler.php`: a pasta é privada e esse arquivo aceita apenas PHP CLI. O retorno 403 é esperado.
+
+Depois de publicar esta atualização, entre como administrador no site **da Hostinger** e abra **Ligar / desligar TVs → Cadastrar TVs e configurar conexão → Ativar agendamento na Hostinger (cron)**. Copie o comando gerado ali e substitua o cron antigo. Mantenha a frequência em todos os minutos, horas, dias e meses.
+
+O formato será:
+
+```sh
+wget -q -O /dev/null "https://tvmax.poseitech.com.br/smartthings-cron.php?key=SUA_CHAVE_GERADA_NO_SERVIDOR"
+```
+
+Não use o texto `SUA_CHAVE_GERADA_NO_SERVIDOR` literalmente. A chave é criada e guardada no banco da instalação, exibida apenas para administradores. Copie o comando do site de produção, não do ambiente local. Como alternativa, o endpoint aceita a chave no cabeçalho `X-TVMax-Cron-Key`. Sem a chave correta, retorna 403. Nunca libere o acesso à pasta `scripts/` para resolver esse erro.
+
+Aguarde até dois minutos e verifique o indicador de agendamento ativo. O cron HTTP só executa os horários vencidos dentro da janela normal; não é um comando para ligar todas as TVs. Se a hospedagem bloquear requisições HTTP por firewall, use o cron PHP CLI acima. Evite configurar as duas formas simultaneamente, embora o bloqueio impeça execução concorrente.
 
 ## Falhas e atrasos
 

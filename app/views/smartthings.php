@@ -24,6 +24,11 @@
   </form>
  </section>
  <details class="panel st-settings" id="stConfiguration"><summary>Cadastrar TVs e configurar conexão</summary>
+  <details class="screen-options"><summary>Ativar agendamento na Hostinger (cron)</summary>
+   <p class="hint">Copie o comando abaixo para o cron personalizado da Hostinger e configure a execução a cada minuto. A chave é exclusiva desta instalação. Não compartilhe o comando.</p>
+   <label class="field">Comando do cron<input class="input" id="stCronCommand" readonly></label><button class="btn small" type="button" data-st-copy="stCronCommand">Copiar comando do cron</button>
+   <p class="hint">Após salvar na hospedagem, aguarde até dois minutos e confira o indicador de agendamento ativo acima.</p>
+  </details>
   <h2>Conexão OAuth · Conta Samsung</h2>
   <p class="hint">Informe as credenciais do seu OAuth-In App. Salve, cadastre o Callback no SmartThings e clique em Conectar conta Samsung. As permissões necessárias são r:devices:* e x:devices:*.</p>
   <form id="stOAuthForm">

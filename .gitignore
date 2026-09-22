@@ -1,0 +1,11 @@
+# Persistent installation data must never be deployed from a developer machine.
+/data/*
+!/data/.htaccess
+/uploads/*
+!/uploads/.htaccess
+/config/local.php
+/.runtime/
+/.env
+/.env.*
+__pycache__/
+*.pyc

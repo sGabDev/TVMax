@@ -4,7 +4,7 @@
 
 Use PHP 8.1 ou superior, com `pdo_sqlite`, `fileinfo`, `mbstring` e `zip`. O PHP precisa escrever em `data/` e `uploads/`. Não use permissões 777 indiscriminadamente; configure o proprietário conforme seu provedor.
 
-Envie as cinco entradas PHP da raiz, `.htaccess`, `app/`, `config/`, `assets/`, `scripts/`, `data/` e `uploads/` para `public_html` ou uma subpasta. Os caminhos são relativos à instalação, sem depender do XAMPP. Inclua os arquivos `.htaccess` das subpastas.
+Na primeira instalação, envie os arquivos PHP da raiz, `.htaccess`, `app/`, `config/`, `assets/`, `scripts/` e os `.htaccess` de `data/` e `uploads/` para `public_html` ou uma subpasta. Não envie banco, sessões ou mídias do ambiente local em atualizações de código. Os caminhos são relativos à instalação, sem depender do XAMPP. Inclua os arquivos `.htaccess` das subpastas. Para uma instalação existente, siga [o procedimento de deploy sem perder dados](deploy-sem-perder-dados.md), especialmente antes do primeiro deploy que remove dados do versionamento.
 
 Para migrar o sistema existente, pare os uploads e as alterações durante a cópia e transfira `data/` e `uploads/` juntos. SQLite pode usar arquivos `accounts.sqlite-wal` e `accounts.sqlite-shm`: não copie somente o banco principal enquanto houver escrita. Faça backup antes da transferência. As contas, auditoria, fila e páginas convertidas serão preservadas. Sessões ficam em `data/sessions/`; é normal precisar entrar novamente após migrar.
 
