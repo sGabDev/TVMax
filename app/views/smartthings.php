@@ -4,11 +4,26 @@
   <p class="hint">Ligue ou desligue as TVs cadastradas na sua conta Samsung. O status é consultado a cada 30 segundos enquanto esta aba estiver aberta.</p>
   <div class="panel-actions"><button class="btn primary" id="stAllOn">Ligar todas</button><button class="btn" id="stAllOff">Desligar todas</button></div>
   <p id="stMessage" role="status" aria-live="polite"></p>
+  <p id="stSchedulerHealth" class="scheduler-health" role="status">Verificando agendamento automático…</p>
   <div id="stList" class="st-list"></div>
   <p class="hint">Offline significa que o SmartThings não consegue alcançar a TV. Para ligar remotamente, a TV precisa manter a conexão em espera e permitir essa função nas configurações de rede.</p>
  </div>
  <?php if($user['role']==='admin'): ?>
- <details class="panel st-settings" open><summary>Configurar SmartThings e TVs</summary>
+ <section class="panel st-settings" id="stSchedulePanel" hidden>
+  <h2 id="stScheduleTitle">Horários da TV</h2>
+  <p class="hint">Escolha os dias e horários. O servidor envia os comandos mesmo com este site fechado. Horário de Brasília.</p>
+  <form id="stScheduleForm">
+   <input id="stScheduleId" type="hidden">
+   <label class="switch-row"><span>Ativar horários automáticos</span><input id="stScheduleEnabled" type="checkbox" checked></label>
+   <fieldset class="schedule-days"><legend>Repetir nos dias</legend>
+    <?php foreach([1=>'Seg',2=>'Ter',3=>'Qua',4=>'Qui',5=>'Sex',6=>'Sáb',7=>'Dom'] as $day=>$label): ?><label><input type="checkbox" name="stDay" value="<?=$day?>" checked> <?=$label?></label><?php endforeach; ?>
+   </fieldset>
+   <div class="queue-schedule"><label>Ligar às<input class="input" id="stOnTime" type="time"></label><label>Desligar às<input class="input" id="stOffTime" type="time"></label></div>
+   <p class="hint">Deixe um horário vazio se quiser apenas ligar ou apenas desligar. Cada horário vale para o próprio dia marcado, inclusive quando passa da meia-noite.</p>
+   <button class="btn primary">Salvar horários</button> <button class="btn" type="button" id="stScheduleCancel">Fechar</button>
+  </form>
+ </section>
+ <details class="panel st-settings" id="stConfiguration"><summary>Cadastrar TVs e configurar conexão</summary>
   <h2>Conexão OAuth · Conta Samsung</h2>
   <p class="hint">Informe as credenciais do seu OAuth-In App. Salve, cadastre o Callback no SmartThings e clique em Conectar conta Samsung. As permissões necessárias são r:devices:* e x:devices:*.</p>
   <form id="stOAuthForm">

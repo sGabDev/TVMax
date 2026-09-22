@@ -1,0 +1,5 @@
+<IfModule mod_headers.c>
+ <FilesMatch "\.(png|jpe?g|gif|webp|mp4|webm|ogv|mp3|ogg|wav)$">
+  Header set Cache-Control "public, max-age=21600"
+ </FilesMatch>
+</IfModule>

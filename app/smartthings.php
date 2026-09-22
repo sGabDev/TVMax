@@ -42,14 +42,38 @@ function st_status(array $health,array $status): string {
     $power=$status['components']['main']['switch']['switch']['value']??null;
     return in_array($power,['on','off'],true)?$power:'unknown';
 }
+function st_tv_request(array $tv,string $suffix,?array $payload=null): array {
+    $db=st_db();
+    $oauth=st_oauth_read();
+    $token=$tv['token']?: (!empty($oauth['clientId'])?st_oauth_access_token():(string)$db->query('SELECT token FROM smartthings_config WHERE id=1')->fetchColumn());
+    $useOAuth=$tv['token']===''&&!empty($oauth['clientId']);
+    $request=static function(string $path,?array $payload=null)use(&$token,$useOAuth):array{
+        try{return st_request($token,$path,$payload);}catch(RuntimeException $error){
+            if(!$useOAuth||$error->getCode()!==401)throw $error;
+            $token=st_oauth_access_token(null,$token);
+            return st_request($token,$path,$payload);
+        }
+    };
+    return $request(rawurlencode($tv['device_id']).$suffix,$payload);
+}
+function st_power(array $tv,string $command): void {
+    if(!in_array($command,['on','off'],true))throw new InvalidArgumentException('Comando inválido.');
+    $result=st_tv_request($tv,'/commands',['commands'=>[['component'=>'main','capability'=>'switch','command'=>$command]]]);
+    $results=$result['results']??[];
+    if(!$results)throw new RuntimeException('O SmartThings não confirmou o recebimento do comando.');
+    foreach($results as $item)if(!in_array($item['status']??'',['ACCEPTED','COMPLETED'],true))throw new RuntimeException('O SmartThings recusou o comando da TV.');
+}
 function smartthings_routes(string $action): never {
     if($action==='smartthings_oauth_start')st_oauth_start();
     session_write_close();
     if(in_array($action,['smartthings_oauth_save','smartthings_oauth_disconnect'],true))st_oauth_routes($action);
     $db=st_db();
+    require_once __DIR__.'/smartthings_schedule.php';
+    st_schedule_db();
+    if($action==='smartthings_schedule_save')st_schedule_save_route();
     if($action==='smartthings_config') {
         $tvs=$db->query('SELECT * FROM smartthings_tvs ORDER BY name')->fetchAll();
-        json_response(['ok'=>true,'tvs'=>array_map('st_public_tv',$tvs),'hasToken'=>(bool)$db->query('SELECT token FROM smartthings_config WHERE id=1')->fetchColumn(),'canConfigure'=>is_admin(),'oauth'=>is_admin()?st_oauth_public(st_oauth_read()):null]);
+        json_response(['ok'=>true,'tvs'=>array_map('st_public_tv',$tvs),'hasToken'=>(bool)$db->query('SELECT token FROM smartthings_config WHERE id=1')->fetchColumn(),'canConfigure'=>is_admin(),'schedules'=>st_schedule_list(),'scheduler'=>st_scheduler_health(),'oauth'=>is_admin()?st_oauth_public(st_oauth_read()):null]);
     }
     if(in_array($action,['smartthings_save','smartthings_delete','smartthings_token'],true)) {
         require_admin();
@@ -58,6 +82,7 @@ function smartthings_routes(string $action): never {
             $q=$db->prepare('INSERT OR REPLACE INTO smartthings_config(id,token) VALUES(1,?)');$q->execute([$token]);
         } elseif($action==='smartthings_delete') {
             $q=$db->prepare('DELETE FROM smartthings_tvs WHERE id=?');$q->execute([(string)($_POST['id']??'')]);
+            $q=$db->prepare('DELETE FROM smartthings_schedules WHERE tv_id=?');$q->execute([(string)($_POST['id']??'')]);
         } else {
             [$name,$device]=st_validate_tv($_POST);$id=(string)($_POST['id']??'');
             $q=$db->prepare('SELECT * FROM smartthings_tvs WHERE id=?');$q->execute([$id]);$old=$q->fetch();
@@ -73,28 +98,14 @@ function smartthings_routes(string $action): never {
     if(!in_array($action,['smartthings_status','smartthings_command'],true))json_response(['ok'=>false,'error'=>'Ação inválida.'],400);
     $q=$db->prepare('SELECT * FROM smartthings_tvs WHERE id=?');$q->execute([(string)($_POST['id']??'')]);$tv=$q->fetch();
     if(!$tv)throw new InvalidArgumentException('TV não encontrada.');
-    $oauth=st_oauth_read();
-    $token=$tv['token']?: (!empty($oauth['clientId'])?st_oauth_access_token():(string)$db->query('SELECT token FROM smartthings_config WHERE id=1')->fetchColumn());
-    $useOAuth=$tv['token']===''&&!empty($oauth['clientId']);
-    $request=static function(string $path,?array $payload=null)use(&$token,$useOAuth):array{
-        try{return st_request($token,$path,$payload);}catch(RuntimeException $error){
-            if(!$useOAuth||$error->getCode()!==401)throw $error;
-            $token=st_oauth_access_token(null,$token);
-            return st_request($token,$path,$payload);
-        }
-    };
-    $path=rawurlencode($tv['device_id']);
     if($action==='smartthings_command') {
         $command=(string)($_POST['command']??'');
         if(!in_array($command,['on','off'],true))throw new InvalidArgumentException('Comando inválido.');
-        $result=$request($path.'/commands',['commands'=>[['component'=>'main','capability'=>'switch','command'=>$command]]]);
-        $results=$result['results']??[];
-        if(!$results)throw new RuntimeException('O SmartThings não confirmou o recebimento do comando.');
-        foreach($results as $item)if(!in_array($item['status']??'',['ACCEPTED','COMPLETED'],true))throw new RuntimeException('O SmartThings recusou o comando da TV.');
+        st_power($tv,$command);
         audit_event('smartthings.power',['command'=>$command],$tv['id']);
         json_response(['ok'=>true,'message'=>'Comando enviado. Aguardando atualização da TV.']);
     }
-    $health=$request($path.'/health');
-    $status=($health['state']??'')==='OFFLINE'?[]:$request($path.'/status');
+    $health=st_tv_request($tv,'/health');
+    $status=($health['state']??'')==='OFFLINE'?[]:st_tv_request($tv,'/status');
     json_response(['ok'=>true,'status'=>st_status($health,$status),'checkedAt'=>time()]);
 }

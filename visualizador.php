@@ -8,13 +8,11 @@
  <div id="layerA" class="media-layer active"></div><div id="layerB" class="media-layer"></div>
  <div id="empty" class="empty-screen"><img class="brand-mark big" src="assets/tvmax-mark.svg" alt="" width="80" height="80"><h1><?=APP_NAME?></h1><p>Aguardando conteúdo do apresentador...</p></div>
  <div id="blackout" class="blackout standby-screen" aria-hidden="true">
-  <div class="standby-card"><img class="standby-logo" src="assets/tvmax-mark.svg" alt="" width="100" height="100">
-   <p class="standby-brand"><?=APP_NAME?></p><h1>Aguardando</h1><p>A apresentação continua em instantes.</p>
-  </div>
+  <?php require __DIR__.'/app/views/paused_screen.php'; ?>
  </div>
  <div id="viewerNotice" class="viewer-notice" role="status" hidden></div>
  <button id="enableMedia" class="btn primary media-enable" aria-describedby="audioHelp">Habilitar áudio nesta tela</button>
- <span id="audioHelp" class="audio-help">Toque para preparar o som, mesmo sem conteúdo na fila.</span>
+ <span id="audioHelp" class="audio-help">Toque para permitir o som nesta TV.</span>
  <div id="clock" class="viewer-clock"></div>
  <div id="progressWrap" class="progress-wrap"><div id="progress"></div></div>
  <button id="fsBtn" class="fs-btn" title="Tela cheia">⛶</button>
@@ -23,5 +21,6 @@
 <script src="assets/timeline.js?v=<?=filemtime(__DIR__.'/assets/timeline.js')?>"></script>
 <script src="assets/sync.js?v=<?=filemtime(__DIR__.'/assets/sync.js')?>"></script>
 <script src="assets/media-layout.js?v=<?=filemtime(__DIR__.'/assets/media-layout.js')?>"></script>
+<script src="assets/viewer-resilience.js?v=<?=filemtime(__DIR__.'/assets/viewer-resilience.js')?>"></script>
 <script src="assets/viewer.js?v=<?=filemtime(__DIR__.'/assets/viewer.js')?>"></script>
 </body></html>

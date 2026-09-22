@@ -2,7 +2,9 @@
  'use strict';
  const el=id=>document.getElementById(id),panel=el('smartthingsPanel');
  const labels={on:'Ligada',off:'Desligada',offline:'Offline',unknown:'Status desconhecido',error:'Falha na consulta',loading:'Consultando…'};
- let tvs=[],busy=false,loaded=false;const states=new Map();
+ let tvs=[],schedules=[],busy=false,loaded=false;const states=new Map();
+ const weekdays={1:'seg',2:'ter',3:'qua',4:'qui',5:'sex',6:'sáb',7:'dom'};
+ function scheduleHealth(info){el('stSchedulerHealth').textContent=info?.active?'● Agendamento automático ativo · horário de Brasília':'Agendamento automático sem execução recente. É necessário ativar o serviço no servidor para os horários funcionarem.';el('stSchedulerHealth').dataset.active=String(!!info?.active);}
  async function request(action,values={}) {
   const response=await fetch('api.php?action=smartthings_'+action,{method:'POST',cache:'no-store',headers:{'X-CSRF-Token':StageAuth.csrf},body:new URLSearchParams(values)});
   const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'Não foi possível concluir a solicitação.');return data;
@@ -18,15 +20,18 @@
    const badge=document.createElement('span');badge.className='st-badge st-'+state.status;badge.textContent=labels[state.status];
    const detail=document.createElement('p');detail.className='hint';detail.textContent=state.message||(state.checkedAt?'Consultado às '+new Date(state.checkedAt*1000).toLocaleTimeString('pt-BR'):'Aguardando consulta');
    const actions=document.createElement('div');actions.className='panel-actions';actions.append(button('Ligar',()=>command([tv],'on')),button('Desligar',()=>command([tv],'off')));
-   if(StageAuth.user.role==='admin')actions.append(button('Editar',()=>edit(tv)),button('Remover',()=>remove(tv)));
-   card.append(name,badge,detail,actions);el('stList').append(card);
+   const schedule=schedules.find(s=>s.tv_id===tv.id),summary=document.createElement('p');summary.className='hint';
+   summary.textContent=schedule?`${Number(schedule.enabled)?'Automático':'Horários desativados'}: ${schedule.days.map(d=>weekdays[d]).join(', ')} · ${schedule.on_time?'Liga '+schedule.on_time:''}${schedule.on_time&&schedule.off_time?' / ':''}${schedule.off_time?'Desliga '+schedule.off_time:''}`:'Sem horários programados';
+   if(schedule?.lastRun){const r=schedule.lastRun;summary.textContent+=' · Última tentativa: '+new Date(r.attempted_at*1000).toLocaleString('pt-BR')+' — '+(r.outcome==='sent'?'comando enviado':r.message);}
+   if(StageAuth.user.role==='admin')actions.append(button('Programar horários',()=>editSchedule(tv)),button('Editar TV',()=>edit(tv)),button('Remover',()=>remove(tv)));
+   card.append(name,badge,detail,summary,actions);el('stList').append(card);
   }
   for(const id of ['stRefresh','stAllOn','stAllOff'])el(id).disabled=busy||!tvs.length;
   panel.querySelectorAll('form button, #stClearToken, #stConnect, #stDisconnect, #stReloadOAuth').forEach(b=>b.disabled=busy);
  }
  async function pool(items,fn){let next=0;await Promise.all(Array.from({length:Math.min(3,items.length)},async()=>{while(next<items.length)await fn(items[next++]);}));}
  async function status(tv){try{states.set(tv.id,await request('status',{id:tv.id}));}catch(error){states.set(tv.id,{status:'error',message:error.message});}render();}
- async function refresh(){if(busy)return;busy=true;render();try{await pool(tvs,status);}finally{busy=false;render();}}
+ async function refresh(){if(busy)return;busy=true;render();try{const config=await request('config');schedules=config.schedules||[];scheduleHealth(config.scheduler);await pool(tvs,status);}catch(error){message(error.message);}finally{busy=false;render();}}
  function showOAuth(c){
   if(!c||!el('stOAuthForm'))return;
   el('stClientId').value=c.clientId;el('stAppId').value=c.appId;el('stBaseUrl').value=c.baseUrl||new URL('.',location.href).href.replace(/\/$/,'');
@@ -37,20 +42,27 @@
   el('stConfirmWebhook').hidden=!c.confirmationUrl;
   if(c.confirmationUrl)el('stConfirmWebhook').href=c.confirmationUrl;else el('stConfirmWebhook').removeAttribute('href');
  }
- async function load(){const data=await request('config');tvs=data.tvs;loaded=true;if(el('stTokenState'))el('stTokenState').textContent=data.hasToken?'— configurado':'— não configurado';showOAuth(data.oauth);render();}
+ async function load(){const data=await request('config');tvs=data.tvs;schedules=data.schedules||[];scheduleHealth(data.scheduler);loaded=true;if(el('stTokenState'))el('stTokenState').textContent=data.hasToken?'— configurado':'— não configurado';showOAuth(data.oauth);if(!tvs.length&&el('stConfiguration'))el('stConfiguration').open=true;render();}
+ function editSchedule(tv){
+  const s=schedules.find(s=>s.tv_id===tv.id);el('stSchedulePanel').hidden=false;el('stScheduleTitle').textContent='Horários · '+tv.name;el('stScheduleId').value=tv.id;
+  el('stScheduleEnabled').checked=s?!!Number(s.enabled):true;el('stOnTime').value=s?.on_time||'';el('stOffTime').value=s?.off_time||'';
+  panel.querySelectorAll('[name=stDay]').forEach(input=>input.checked=!s||s.days.includes(Number(input.value)));el('stSchedulePanel').scrollIntoView({behavior:'smooth',block:'nearest'});el('stOnTime').focus();
+ }
  async function command(targets,power){
   if(busy)return;busy=true;render();message('Enviando comandos…');let failures=0;
   try{await pool(targets,async tv=>{try{const result=await request('command',{id:tv.id,command:power});states.set(tv.id,{status:'unknown',message:result.message});}catch(error){failures++;states.set(tv.id,{status:'error',message:error.message});}render();});message(`${targets.length-failures} comando(s) enviado(s), ${failures} falha(s). O status será consultado novamente.`);}finally{busy=false;render();}
   setTimeout(()=>{if(!panel.hidden)refresh();},3000);
  }
  function reset(){el('stTvForm').reset();el('stId').value='';el('stFormTitle').textContent='Cadastrar TV';}
- function edit(tv){reset();el('stId').value=tv.id;el('stName').value=tv.name;el('stDevice').value=tv.deviceId;el('stFormTitle').textContent='Editar TV'+(tv.hasToken?' — token exclusivo configurado':' — usa OAuth / conexão padrão');panel.querySelector('details').open=true;el('stName').focus();}
+ function edit(tv){reset();el('stId').value=tv.id;el('stName').value=tv.name;el('stDevice').value=tv.deviceId;el('stFormTitle').textContent='Editar TV'+(tv.hasToken?' — token exclusivo configurado':' — usa OAuth / conexão padrão');el('stConfiguration').open=true;el('stName').focus();}
  async function mutate(action,values,done){if(busy)return;busy=true;render();try{await request(action,values);done?.();await load();message('Configuração salva.');}catch(error){message(error.message);}finally{busy=false;render();}}
- function remove(tv){if(confirm('Remover '+tv.name+' deste painel?'))mutate('delete',{id:tv.id},()=>{states.delete(tv.id);if(el('stId').value===tv.id)reset();});}
+ function remove(tv){if(confirm('Remover '+tv.name+' e seus horários deste painel?'))mutate('delete',{id:tv.id},()=>{states.delete(tv.id);if(el('stId').value===tv.id)reset();if(el('stScheduleId').value===tv.id)el('stSchedulePanel').hidden=true;});}
  function select(show){panel.hidden=!show;el('presentationPanel').hidden=show;el('presentationTab').setAttribute('aria-pressed',String(!show));el('smartthingsTab').setAttribute('aria-pressed',String(show));if(show){(async()=>{try{if(!loaded)await load();await refresh();}catch(error){message(error.message);}})();}}
  el('presentationTab').onclick=()=>select(false);el('smartthingsTab').onclick=()=>select(true);
  el('stRefresh').onclick=refresh;el('stAllOn').onclick=()=>command([...tvs],'on');el('stAllOff').onclick=()=>command([...tvs],'off');
  if(el('stTvForm')){
+  el('stScheduleCancel').onclick=()=>el('stSchedulePanel').hidden=true;
+  el('stScheduleForm').onsubmit=e=>{e.preventDefault();mutate('schedule_save',{id:el('stScheduleId').value,enabled:el('stScheduleEnabled').checked?'1':'',days:[...panel.querySelectorAll('[name=stDay]:checked')].map(i=>i.value).join(','),onTime:el('stOnTime').value,offTime:el('stOffTime').value},()=>el('stSchedulePanel').hidden=true);};
   el('stOAuthForm').onsubmit=e=>{e.preventDefault();mutate('oauth_save',{clientId:el('stClientId').value,clientSecret:el('stClientSecret').value,baseUrl:el('stBaseUrl').value,appId:el('stAppId').value},()=>{el('stClientSecret').value='';});};
   el('stConnect').onclick=async()=>{if(busy)return;busy=true;render();try{
    const saved=await request('config');const c=saved.oauth;
