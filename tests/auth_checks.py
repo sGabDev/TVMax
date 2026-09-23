@@ -56,6 +56,44 @@ def check_accounts(base,opener,csrf,folder):
     uploaded=visitor.upload()['state']['items'][-1]
     assert uploaded['uploadedBy']=={'id':operator['id'],'name':'Operator Test'}
     assert (folder/uploaded['src']).is_file()
+    renamed=visitor.call('rename',{'id':uploaded['id'],'title':'  Organizado  '})['state']
+    assert next(i for i in renamed['items'] if i['id']==uploaded['id'])['title']=='Organizado'
+    visitor.call('rename',{'id':uploaded['id'],'title':'   '},status=400)
+    visitor.call('rename',{'id':'missing','title':'Name'},status=400)
+    visitor.call('rename',{'id':uploaded['id'],'title':'Name'},token='invalid',status=403)
+    visitor.call('archive',{'id':uploaded['id']})
+    renamed=visitor.call('rename',{'id':uploaded['id'],'title':'Arquivo arquivado'})['state']
+    assert next(i for i in renamed['items'] if i['id']==uploaded['id'])['title']=='Arquivo arquivado'
+    visitor.call('purge',{'id':uploaded['id']},status=403)
+    admin.call('purge',{'id':uploaded['id']},token='invalid',status=403)
+    assert (folder/uploaded['src']).is_file()
+    # Simulate converted pages and a previous quality render, without a converter.
+    statefile=folder/'data/state.json'
+    fixture=json.loads(statefile.read_text(encoding='utf-8'))
+    key=uploaded['src'].split('/')[-1].rsplit('.',1)[0]
+    page_paths=[]
+    for suffix in ['-pages','-hd-abcdef12-pages']:
+        directory=folder/'uploads'/(key+suffix)
+        directory.mkdir();page=directory/'page-1.png';page.write_bytes(b'page')
+        page_paths.append(page)
+    for entry in fixture['items']:
+        if entry['id']==uploaded['id']:entry['pages']=[page_paths[-1].relative_to(folder).as_posix()]
+    statefile.write_text(json.dumps(fixture),encoding='utf-8')
+    purged=admin.call('purge',{'id':uploaded['id']})['state']
+    assert all(i['id']!=uploaded['id'] for i in purged['items'])
+    assert not (folder/uploaded['src']).exists()
+    assert all(not p.parent.exists() for p in page_paths)
+    admin.call('purge',{'id':uploaded['id']},status=400)
+    visitor.call('restore',{'id':uploaded['id']},status=400)
+    # Deleting the currently selected upload keeps the queue usable.
+    active=visitor.upload()['state']['items'][-1]
+    fallback=visitor.call('add_text',{'title':'Fallback','text':'Next'})['state']['items'][-1]
+    visitor.call('select',{'id':active['id']})
+    purged=admin.call('purge',{'id':active['id']})['state']
+    assert purged['playback']['currentId']==fallback['id']
+    purged=admin.call('purge',{'id':fallback['id']})['state']
+    assert not purged['items'] and purged['playback']['currentId'] is None
+    print('PASS rename, archived rename, admin-only deletion, CSRF, media cleanup and playback')
     state=visitor.call('add_text',{'title':'Audit test','text':'Original text','duration':'10','uploadedBy':'forged'})['state']
     item=state['items'][-1];assert item['uploadedBy']['id']==operator['id']
     visitor.call('save',json_body={'screen':{'volume':34},'items':[{'id':item['id'],'duration':17,'text':'Changed text','uploadedBy':{'name':'FORGED'}}]})

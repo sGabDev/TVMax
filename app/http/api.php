@@ -18,6 +18,33 @@ session_write_close();
 require_once APP_ROOT.'/app/documents.php';
 $GLOBALS['auditAction']=['save'=>'presentation.edit','upload'=>'presentation.upload','add_text'=>'presentation.text','archive'=>'presentation.archive','delete'=>'presentation.archive','restore'=>'presentation.restore','prepare'=>'presentation.quality','select'=>'playback.select'][$action]??('presentation.'.$action);
 
+if ($action === 'rename') {
+    $id=(string)($_POST['id']??'');
+    $title=clean_text((string)($_POST['title']??''),120);
+    if($title==='')throw new InvalidArgumentException('Informe um nome para o arquivo.');
+    $s=mutate_state(static function(&$s)use($id,$title){
+        $index=array_search($id,array_column($s['items'],'id'),true);
+        if($index===false)throw new InvalidArgumentException('Item não encontrado.');
+        $s['items'][$index]['title']=$title;
+    });
+    state_response($s);
+}
+
+if ($action === 'purge') {
+    require_admin();
+    $id=(string)($_POST['id']??'');
+    $s=mutate_state(static function(&$s)use($id){
+        $index=array_search($id,array_column($s['items'],'id'),true);
+        if($index===false)throw new InvalidArgumentException('Item não encontrado.');
+        $now=microtime(true)*1000;$position=timeline($s,$now);
+        delete_uploaded_media($s['items'][$index],$s['items']);
+        array_splice($s['items'],$index,1);
+        if($position['currentId']===$id){$available=timeline_items($s,$now);$position['currentId']=$available[0]['id']??null;$position['offsetMs']=0;}
+        anchor_playback($s,$position,$now);
+    });
+    state_response($s);
+}
+
 if ($action === 'upload') {
     if (empty($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
         json_response(['ok'=>false,'error'=>'Falha no upload'], 400);

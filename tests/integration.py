@@ -14,7 +14,8 @@ import zipfile
 
 ROOT=Path(__file__).resolve().parent.parent
 sys.path.insert(0,str(ROOT/'.runtime/python'))
-import pymupdf
+if '--queue-only' not in sys.argv and '--auth-only' not in sys.argv:
+    import pymupdf
 
 def fixtures(folder):
     with pymupdf.open() as doc:

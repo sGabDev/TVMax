@@ -54,6 +54,25 @@ async function repairVideoDurations(){
  try{const duration=await readVideoDuration(item.src);const fd=new FormData();fd.append('id',item.id);fd.append('duration',duration);await api('video_duration',{method:'POST',body:fd})}
  catch(error){toast(item.title+': '+error.message)}finally{checkingVideo=false;repairVideoDurations()}
 }
+function mediaActions(){return `<button class="btn small rename-item">Renomear</button>${globalThis.StageAuth?.user?.role==='admin'?'<button class="btn small danger purge-item">Apagar definitivamente</button>':''}`}
+function bindMediaActions(){
+ $$('.rename-item').forEach(button=>button.onclick=()=>run(async()=>{
+  const id=button.closest('[data-id]').dataset.id,item=state.items.find(it=>it.id===id);
+  const title=prompt('Nome exibido na fila e nos arquivados (até 120 caracteres):',item.title);
+  if(title===null)return;
+  if(!title.trim()||title.trim().length>120)throw new Error('Informe um nome com 1 a 120 caracteres.');
+  if(dirty)await save();
+  const fd=new FormData();fd.append('id',id);fd.append('title',title);
+  await api('rename',{method:'POST',body:fd});toast('Nome atualizado.');
+ }));
+ $$('.purge-item').forEach(button=>button.onclick=()=>run(async()=>{
+  const id=button.closest('[data-id]').dataset.id,item=state.items.find(it=>it.id===id);
+  if(!confirm(`Apagar definitivamente “${item.title}”? O arquivo e suas páginas serão excluídos e o item sairá da programação. Esta ação não pode ser desfeita.`))return;
+  if(dirty)await save();
+  const fd=new FormData();fd.append('id',id);await api('purge',{method:'POST',body:fd});
+  scheduleDrafts.delete(id);toast('Item apagado definitivamente.');
+ }));
+}
 function renderQueue(){
  const list=$('#playlist'),archive=$('#archiveList'),top=list.scrollTop,archiveTop=archive.scrollTop;
  const opened=new Set($$('.item details[open]').map(el=>el.closest('.item').dataset.id));
@@ -62,14 +81,14 @@ function renderQueue(){
  list.innerHTML=active.length?active.map((it,i)=>`
  <article class="item queue-card" draggable="true" data-id="${esc(it.id)}" data-title="${esc(it.title.toLowerCase())}">
   <div class="queue-card-top"><span class="queue-index">${i+1}</span>${thumbnail(it)}<div class="item-title"><b title="${esc(it.title)}">${esc(it.title)}</b><small>${typeName(it.type)}${it.pages?.length?' / '+it.pages.length+' p\u00e1ginas':''}${it.renderQuality==='fullhd'?' / Full HD+':''}</small><small class="upload-author">Enviado por ${esc(it.uploadedBy?.name||'Autor n\u00e3o registrado (conte\u00fado antigo)')}</small><span class="item-status"></span></div></div>
-  <div class="queue-card-actions"><button class="btn small select-item">\u25b6 Exibir agora</button></div>
+  <div class="queue-card-actions"><button class="btn small select-item">\u25b6 Exibir agora</button>${mediaActions()}</div>
   <details ${opened.has(it.id)?'open':''}><summary>Mais opções: ordem, tempo e datas</summary><div class="queue-card-actions"><button class="btn small move-up" ${i===0?'disabled':''} aria-label="Mover para cima">\u2191 Subir</button><button class="btn small move-down" ${i===active.length-1?'disabled':''} aria-label="Mover para baixo">\u2193 Descer</button>${it.type==='presentation'&&it.renderQuality!=='fullhd'?'<button class="btn small quality">Melhorar qualidade</button>':''}<button class="btn small archive-item" title="Remover da fila e guardar nos arquivados">Guardar nos arquivados</button></div><div class="queue-timing"><label>${it.type==='video'?'Dura\u00e7\u00e3o do v\u00eddeo (s)':'Tempo por p\u00e1gina (s)'}<input ${it.type==='video'?'readonly':''} step="any" class="input duration" type="number" min="1" max="86400" value="${Number(it.duration)||10}"></label><label>Intervalo ao terminar (s)<input class="input delay" type="number" min="0" max="3600" value="${Number(it.delay)||0}"></label><span class="queue-total">Total: ${formatDuration((it.duration||10)*Math.max(1,it.pages?.length||0)+(it.delay||0))}</span></div>
   <div class="queue-schedule"><label>Início<input class="input start" type="datetime-local" value="${esc((scheduleDrafts.get(it.id)||it).startsAt||'')}"></label><label>Fim<input class="input end" type="datetime-local" value="${esc((scheduleDrafts.get(it.id)||it).endsAt||'')}"></label></div><p class="schedule-status hint" role="status">${scheduleDrafts.has(it.id)?'Alterações ainda não salvas.':'Preencha as datas e clique em Salvar. Horário de Brasília.'}</p><div class="schedule-actions"><button class="btn small primary save-schedule">Salvar agendamento</button><button class="btn small cancel-schedule">Cancelar alterações</button></div></details>
  </article>`).join(''):'<div class="dropzone"><b>A fila est\u00e1 vazia</b><span>Adicione conte\u00fado ou recupere um item dos arquivados.</span></div>';
- archive.innerHTML=archived.length?archived.map(it=>`<article class="archived-card" data-id="${esc(it.id)}" data-title="${esc(it.title.toLowerCase())}"><div class="queue-card-top">${thumbnail(it)}<div class="item-title"><b>${esc(it.title)}</b><small>${it.archiveReason==='expired'?'Validade encerrada':'Arquivado manualmente'} / ${new Date(it.archivedAt).toLocaleString('pt-BR')}</small><small>Enviado por ${esc(it.uploadedBy?.name||'Autor n\u00e3o registrado (conte\u00fado antigo)')}</small></div></div><button class="btn small restore-item">Recuperar para a fila</button></article>`).join(''):'<div class="dropzone"><b>Nenhum item arquivado</b><span>Os itens removidos ou com validade encerrada aparecer\u00e3o aqui.</span></div>';
+ archive.innerHTML=archived.length?archived.map(it=>`<article class="archived-card" data-id="${esc(it.id)}" data-title="${esc(it.title.toLowerCase())}"><div class="queue-card-top">${thumbnail(it)}<div class="item-title"><b>${esc(it.title)}</b><small>${it.archiveReason==='expired'?'Validade encerrada':'Arquivado manualmente'} / ${new Date(it.archivedAt).toLocaleString('pt-BR')}</small><small>Enviado por ${esc(it.uploadedBy?.name||'Autor n\u00e3o registrado (conte\u00fado antigo)')}</small></div></div><div class="queue-card-actions"><button class="btn small restore-item">Recuperar para a fila</button>${mediaActions()}</div></article>`).join(''):'<div class="dropzone"><b>Nenhum item arquivado</b><span>Os itens removidos ou com validade encerrada aparecer\u00e3o aqui.</span></div>';
  $('#queueCount').textContent=active.length;$('#archiveCount').textContent=archived.length;
  $('#queueSummary').textContent=active.length+' item(ns) na fila / '+formatDuration(active.reduce((sum,it)=>sum+(it.duration||10)*Math.max(1,it.pages?.length||0)+(it.delay||0),0))+'. A lista se repete automaticamente.';
- bindItems();$$('.restore-item').forEach(b=>b.onclick=()=>run(()=>itemAction('restore',b.closest('.archived-card').dataset.id)));
+ bindMediaActions();bindItems();$$('.restore-item').forEach(b=>b.onclick=()=>run(()=>itemAction('restore',b.closest('.archived-card').dataset.id)));
  filterQueue();list.scrollTop=top;archive.scrollTop=archiveTop;
 }
 function formatDuration(seconds){seconds=Math.round(seconds);return seconds>=3600?Math.floor(seconds/3600)+'h '+Math.floor(seconds%3600/60)+'min':seconds>=60?Math.floor(seconds/60)+'min '+seconds%60+'s':seconds+'s'}

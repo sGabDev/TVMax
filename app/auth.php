@@ -172,6 +172,7 @@ function audit_state_change(array $before,array $after,bool $system=false): void
         if(($old['pages']??[])!==($it['pages']??[]))$diff['pages']=['before'=>count($old['pages']??[]),'after'=>count($it['pages']??[])];
         if($diff)$changes['items'][]=['id'=>$it['id'],'title'=>$it['title'],'changes'=>$diff];
     }
+    foreach($before['items'] as $it)if(!in_array($it['id'],array_column($after['items'],'id'),true))$changes['removed'][]=['id'=>$it['id'],'title'=>$it['title']];
     if(array_column($before['items'],'id')!==array_column($after['items'],'id'))$changes['order']=['before'=>array_column($before['items'],'id'),'after'=>array_column($after['items'],'id')];
     $action=$system?'queue.automatic':($GLOBALS['auditAction']??'system.maintenance');
     if(str_starts_with($action,'playback.')){

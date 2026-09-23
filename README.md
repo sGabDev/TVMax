@@ -271,11 +271,13 @@ Outras configurações continuam com salvamento automático. Um fim já vencido 
 
 A fila repete enquanto houver conteúdo habilitado e dentro da validade. Terminar um item, avançar ou selecionar outro **não arquiva** o conteúdo.
 
-O item vai para **Arquivados** ao clicar em **Remover** ou quando vence a validade final, inclusive com a apresentação pausada. Os arquivos originais, páginas e dados do item são preservados.
+O item vai para **Arquivados** ao clicar em **Guardar nos arquivados** ou quando vence a validade final, inclusive com a apresentação pausada. Os arquivos originais, páginas e dados do item são preservados.
 
 Na aba **Arquivados**, use a busca, selecione 10/20/50/100 itens por página e clique em **Recuperar para a fila**. O item volta ao final; uma data final vencida é limpa para evitar arquivamento imediato.
 
-Arquivar não libera espaço em disco. Não há exclusão definitiva de mídias pela interface.
+Use **Renomear** na fila ou nos arquivados para alterar o nome exibido (até 120 caracteres), preservando o arquivo e os agendamentos. Usuários aprovados podem renomear os conteúdos.
+
+Arquivar não libera espaço em disco. Administradores podem usar **Apagar definitivamente** na fila ou nos arquivados. Após a confirmação, o item, o original e as páginas convertidas são apagados. Se estiver em exibição, a programação passa para outro conteúdo disponível. A exclusão não pode ser desfeita e fica registrada na auditoria.
 
 ### Controle ao vivo
 
@@ -505,7 +507,7 @@ Os testes não substituem conferir layout, reprodução, áudio e legibilidade n
 - Visualizador público, sem modo offline completo.
 - Reprodução depende de codecs e políticas do navegador; não há transcodificação automática de vídeo/áudio.
 - Documentos estáticos, sem animações ou mídias internas dos slides.
-- Sem recuperação de senha por e-mail, exclusão definitiva de mídias ou limpeza de logs pela interface.
+- Sem recuperação de senha por e-mail ou limpeza de logs pela interface.
 - Alta resolução e muitos visualizadores aumentam uso de armazenamento, banda e requisições; dimensione o servidor para a carga real.
 - Dependências externas possuem licenças próprias; confira os termos antes de redistribuir binários.
 
