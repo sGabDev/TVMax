@@ -140,6 +140,9 @@ if ($action === 'video_duration') {
 
 if ($action === 'schedule') {
     $id=(string)($_POST['id']??'');$dates=[];
+    $period=(string)($_POST['dayPeriod']??'all');
+    if(!in_array($period,['all','morning','afternoon','night'],true))throw new InvalidArgumentException('Período inválido.');
+    $dates['dayPeriod']=$period;
     foreach(['startsAt','endsAt'] as $key) {
         $value=(string)($_POST[$key]??'');
         $date=$value===''?false:DateTimeImmutable::createFromFormat('!Y-m-d\TH:i',$value);

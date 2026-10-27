@@ -1,8 +1,13 @@
 <?php
 // The server and assets/timeline.js use the same millisecond timeline.
+function item_period_active(array $item, float $now): bool {
+    $period=$item['dayPeriod']??'all';
+    $hour=(int)(new DateTimeImmutable('@'.(int)floor($now/1000)))->setTimezone(new DateTimeZone('America/Sao_Paulo'))->format('G');
+    return match($period) {'morning'=>$hour>=6&&$hour<12,'afternoon'=>$hour>=12&&$hour<18,'night'=>$hour>=18||$hour<6,default=>true};
+}
 function timeline_items(array $state, float $now): array {
     return array_values(array_filter($state['items'], static function ($it) use ($now) {
-        return !empty($it['enabled']) && empty($it['archivedAt']) && ($it['type']??'') !== 'url'
+        return !empty($it['enabled']) && empty($it['archivedAt']) && ($it['type']??'') !== 'url' && item_period_active($it,$now)
             && (empty($it['startsAt']) || strtotime($it['startsAt'])*1000 <= $now)
             && (empty($it['endsAt']) || strtotime($it['endsAt'])*1000 > $now);
     }));

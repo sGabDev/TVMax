@@ -20,9 +20,6 @@
  if('serviceWorker' in navigator&&globalThis.isSecureContext){
   navigator.serviceWorker.register('viewer-cache-sw.js').then(()=>navigator.serviceWorker.ready).then(reg=>{worker=reg.active;if(lastState)warm(lastState);}).catch(()=>{});
  }
- let idle;
- const active=()=>{document.body.classList.remove('cursor-idle');clearTimeout(idle);idle=setTimeout(()=>document.body.classList.add('cursor-idle'),3000);};
- document.addEventListener('pointermove',active,{passive:true});document.addEventListener('pointerdown',active,{passive:true});active();
  setInterval(()=>{if(lastState){lastWarm='';warm(lastState);}},30*60*1000);
  globalThis.addEventListener('error',event=>{if(event instanceof ErrorEvent)recover('O visualizador encontrou um erro.');});
  globalThis.addEventListener('unhandledrejection',event=>{if(!['NotAllowedError','AbortError'].includes(event.reason?.name))recover('O visualizador encontrou uma falha.');});

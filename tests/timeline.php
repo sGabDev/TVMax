@@ -41,4 +41,10 @@ check(!timeline($state,2000600)['blackout']&&!timeline($state,2000600)['paused']
 control_playback($state,'select',1000300,'a');
 check(timeline($state,1000300)['offsetMs']===0.0,'Selection restarts the presentation');
 $state['items']=[];check(timeline($state,10000000)['currentId']===null,'Empty playlist');
+$periodState=['items'=>array_map(static fn($period)=>['id'=>$period,'type'=>'text','enabled'=>true,'duration'=>10,'dayPeriod'=>$period],['all','morning','afternoon','night']),'playback'=>['anchorId'=>'morning','anchorAtMs'=>0,'offsetMs'=>0,'paused'=>false]];
+foreach(['05:59'=>'night','06:00'=>'morning','11:59'=>'morning','12:00'=>'afternoon','17:59'=>'afternoon','18:00'=>'night','23:59'=>'night','00:00'=>'night'] as $clock=>$expected){
+    $now=strtotime('2026-10-27 '.$clock.':00')*1000;
+    check(array_column(timeline_items($periodState,$now),'id')===['all',$expected],'Daily period boundary '.$clock);
+    $snapshots[]=['state'=>$periodState,'now'=>$now,'position'=>timeline($periodState,$now)];
+}
 echo json_encode($snapshots);

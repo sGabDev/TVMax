@@ -131,6 +131,7 @@ function clean_text(string $s, int $max = 5000): string {
 function item_active(array $item): bool {
     if (empty($item['enabled'])) return false;
     $now = time();
+    if (!item_period_active($item,$now*1000)) return false;
     if (!empty($item['startsAt']) && strtotime($item['startsAt']) > $now) return false;
     if (!empty($item['endsAt']) && strtotime($item['endsAt']) < $now) return false;
     return true;

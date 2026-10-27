@@ -9,8 +9,11 @@ function environment(){
  vm.runInContext(fs.readFileSync('assets/viewer-resilience.js','utf8'),env);
  return {env,timers,events,classes,navigator,fire(ms){for(const t of timers.splice(0))if(!t.cancelled&&t.ms===ms)t.fn();}};
 }
-let e=environment();e.fire(3000);assert.ok(e.classes.has('cursor-idle'));e.events.pointermove();assert.ok(!e.classes.has('cursor-idle'));
+let e=environment();
+assert.equal(e.events.pointermove,undefined,'Pointer movement must not restore the cursor');
+assert.equal(e.events.pointerdown,undefined,'Pointer clicks must not restore the cursor');
+assert.ok(fs.readFileSync('assets/theme.css','utf8').includes('.viewer,.viewer *{cursor:none!important}'),'Hide the cursor immediately throughout the viewer, including its controls');
 for(let i=0;i<3;i++){e=environment();e.env.StageRecovery.recover('Test');e.env.StageRecovery.recover('Duplicate');e.fire(5000);}
 assert.equal(reloads,3,'Only one reload per page failure');e=environment();e.env.StageRecovery.recover('Test');e.fire(5000);assert.equal(reloads,3,'Persist retry cap across page reloads');
 stored.clear();e=environment();e.navigator.onLine=false;e.env.StageRecovery.recover('Offline');e.fire(5000);assert.equal(reloads,3,'Do not reload an offline page');
-console.log('PASS cursor inactivity, automatic recovery deduplication, persisted retry cap and offline playback protection');
+console.log('PASS permanently hidden viewer cursor, automatic recovery deduplication, persisted retry cap and offline playback protection');

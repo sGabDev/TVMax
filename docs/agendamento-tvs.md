@@ -54,3 +54,17 @@ O resultado “comando enviado” significa aceito pela API; confira o status da
 
 Teste sem enviar comandos: `php scripts/smartthings_scheduler.php --check`.
 Testes isolados com transporte simulado: `php tests/smartthings_schedule.php`.
+
+
+## Per?odos de exibi??o dos arquivos
+
+Em **Seus arquivos ? Organizar e agendar**, escolha o per?odo e clique em **Salvar agendamento**:
+
+- **Todos os hor?rios:** o arquivo pode aparecer a qualquer hora.
+- **Manh?:** das 06h at? antes das 12h.
+- **Tarde:** das 12h at? antes das 18h.
+- **Noite:** das 18h at? antes das 06h do dia seguinte.
+
+O hor?rio usado ? o de Bras?lia. O per?odo se repete diariamente e pode ser combinado com in?cio e fim opcionais. Fora do per?odo, o arquivo permanece na fila e aguarda o pr?ximo hor?rio permitido. A validade final continua enviando o arquivo aos arquivados.
+
+Use **Visualizar arquivo** para conferir imagens, mensagens, v?deos, ?udios e p?ginas de documentos, inclusive nos arquivados. A pr?via n?o altera o que est? sendo exibido nas TVs. **Renomear** permite alterar o t?tulo; **Arquivar arquivo** guarda o conte?do para recupera??o posterior.

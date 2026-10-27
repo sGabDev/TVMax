@@ -10,11 +10,10 @@
  <div class="status"><span class="dot"></span><span id="connectionLabel" role="status">Conectando ao servidor...</span></div>
  <div class="top-actions"><span class="session-name"><?=htmlspecialchars($user['name'],ENT_QUOTES,'UTF-8')?></span><?php if($user['role']==='admin'): ?><a class="btn small" href="administracao.php">Usuários e logs</a><?php endif; ?><a class="btn small" id="openViewer" href="visualizador.php" target="_blank" rel="noopener">Abrir TV ↗</a><button class="btn small" id="logout">Sair</button></div>
 </header>
-<main class="shell">
+<main class="shell" id="mainContent">
  <div class="account-tabs" role="group" aria-label="Área do apresentador"><button class="btn" id="presentationTab" aria-pressed="true">Conteúdo na tela</button><button class="btn" id="smartthingsTab" aria-pressed="false">Ligar / desligar TVs</button></div>
  <?php require __DIR__.'/app/views/smartthings.php'; ?>
  <div id="presentationPanel">
- <ol class="presenter-guide" aria-label="Como usar"><li><b>1. Adicione</b><span>Escolha fotos, vídeos ou documentos.</span></li><li><b>2. Organize</b><span>A lista toca na ordem, de cima para baixo.</span></li><li><b>3. Apresente</b><span>Use Reproduzir ou Exibir agora em um arquivo.</span></li></ol>
  <section class="hero-panel">
   <div><span class="eyebrow">TRANSMISSÃO</span><h1>O que aparece nas TVs</h1><p id="playbackStatus" class="playback-status" role="status">Conectando...</p><p id="commandStatus" class="hint" role="status" aria-live="polite"></p><p id="nowLabel">Carregando programação...</p></div>
   <div class="transport">
@@ -26,23 +25,23 @@
 
  <div class="grid">
   <section class="panel span2 queue-panel">
-   <div class="panel-head"><div><h2>Seus arquivos</h2></div>
-   <div class="panel-actions"><button class="btn primary" id="uploadBtn">＋ Adicionar arquivos</button><button class="btn" id="textBtn">Escrever mensagem</button><button class="btn" id="screenSettingsToggle" aria-expanded="false" aria-controls="screenSettings">Som e ajustes</button></div></div>
+   <div class="panel-head"><div><span class="eyebrow">SUA BIBLIOTECA</span><h2>Seus arquivos</h2><p class="hint library-intro">Adicione, organize e escolha o que exibir nas TVs.</p></div>
+   <div class="panel-actions"><button class="btn primary" id="uploadBtn">＋ Adicionar arquivos</button><button class="btn" id="textBtn">Escrever mensagem</button><button class="btn" id="screenSettingsToggle" aria-expanded="false" aria-controls="screenSettings">Opções da tela</button></div></div>
    <input type="file" id="fileInput" multiple hidden accept="image/*,video/*,audio/*,.pdf,.xlsx,.xls,.pptx,.ppt,.ppsx,.pps,.odp,.ods">
-   <div class="dropzone" id="dropzone"><b>Arraste arquivos para cá</b><span>Imagens, vídeos, áudios, PDF, Excel e PowerPoint • até <?=MAX_UPLOAD_MB?> MB</span></div>
-   <p class="hint">Exibir agora coloca o arquivo na tela imediatamente. Pausar mantém a TV ligada e mostra o aviso de transmissão pausada.</p>
+   <div class="dropzone" id="dropzone"><span class="upload-glyph" aria-hidden="true">↑</span><b>Arraste arquivos para cá</b><span>Imagens, vídeos, áudios, PDF, Excel e PowerPoint • até <?=MAX_UPLOAD_MB?> MB</span></div>
    <div class="queue-tools">
     <div class="queue-tabs" role="group" aria-label="Listas de conteúdo"><button class="btn small active" id="queueTab" aria-pressed="true">Na fila <span id="queueCount">0</span></button><button class="btn small" id="archiveTab" aria-pressed="false">Arquivados <span id="archiveCount">0</span></button></div>
     <input id="queueSearch" type="search" class="input" placeholder="Buscar pelo título…" aria-label="Buscar conteúdo">
-    <p class="hint" id="queueSummary">Os itens repetem na fila. Apenas validade vencida ou remoção envia para Arquivados.</p>
+    <p class="hint" id="queueSummary"></p>
    </div>
+   <p class="hint library-tip">Clique no nome de um arquivo para editá-lo. Arraste os cartões para organizar a fila.</p>
    <div class="playlist" id="playlist" tabindex="0" aria-label="Fila de exibição"></div>
    <div class="playlist" id="archiveList" tabindex="0" aria-label="Conteúdos arquivados" hidden></div>
    <nav id="archivePagination" class="archive-pagination" aria-label="Páginas dos arquivados" hidden><label>Itens por página <select id="archivePageSize" class="input"><option>10</option><option>20</option><option>50</option><option>100</option></select></label><span id="archivePageLabel" role="status"></span><div><button id="archivePrev" class="btn small">Anterior</button> <button id="archiveNext" class="btn small">Próxima</button></div></nav>
   </section>
 
   <aside class="panel" id="screenSettings" hidden>
-   <div class="panel-head"><div><span class="eyebrow">TELA</span><h2>Configurações</h2></div></div>
+   <div class="panel-head"><div><span class="eyebrow">TELA</span><h2>Opções da tela</h2><p class="hint">Os ajustes são salvos automaticamente e aplicados às TVs.</p></div></div>
    <label class="field">Volume geral <span id="volLabel">70%</span><input id="volume" type="range" min="0" max="100"></label>
    <label class="switch-row"><span>Silenciar</span><input id="muted" type="checkbox"></label>
    <details class="screen-options"><summary>Aparência e transições</summary>
@@ -50,7 +49,7 @@
    <label class="switch-row"><span>Barra de progresso</span><input id="showProgress" type="checkbox"></label>
    <label class="field">Ajuste da mídia<select id="fit" class="input" aria-describedby="fitHint"><option value="width">Ajustar à largura</option><option value="height">Ajustar à altura</option><option value="contain" selected>Ajustar à tela</option></select></label>
    <p class="hint" id="fitHint">Mostra todo o conteúdo sem cortes, mantendo a proporção em celulares e TVs.</p>
-   <label class="field">Transição<select id="transition" class="input"><option value="fade">Fade</option><option value="slide">Deslizar</option><option value="zoom">Zoom</option><option value="none">Sem efeito</option></select></label>
+   <label class="field">Transição<select id="transition" class="input"><option value="fade">Suave (dissolver)</option><option value="slide">Deslizar</option><option value="zoom">Zoom</option><option value="none">Sem efeito</option></select></label>
    <label class="field">Duração da transição <span id="transitionMsLabel">650 ms</span><input id="transitionMs" type="range" min="0" max="2000" step="50" value="650"></label>
    <label class="field">Fundo<input id="background" class="input color" type="color"></label>
    </details>
@@ -64,11 +63,13 @@
  </div>
 </main>
 
-<div class="modal" id="textModal"><div class="modal-card"><button class="modal-x">×</button><h2>Novo texto</h2>
+<div class="modal" id="textModal" role="dialog" aria-modal="true" aria-labelledby="textHeading"><div class="modal-card"><button class="modal-x">×</button><h2 id="textHeading">Nova mensagem</h2>
 <label class="field">Nome da mensagem<input id="textTitle" class="input" placeholder="Ex.: Boas-vindas"></label><label class="field">Mensagem na TV<textarea id="textContent" class="input area" placeholder="Digite o texto que aparecerá na TV"></textarea></label>
 <div class="modal-row"><label class="field">Tempo (s)<input id="textDuration" class="input" type="number" min="1" value="10"></label></div>
 <button class="btn primary wide" id="saveText">Adicionar à fila</button></div></div>
 
+<div class="modal" id="mediaModal" role="dialog" aria-modal="true" aria-labelledby="mediaTitle"><div class="modal-card media-modal-card"><button class="modal-x" aria-label="Fechar prévia">×</button><span class="eyebrow">PRÉVIA DO ARQUIVO</span><h2 id="mediaTitle"></h2><div id="mediaPreview" class="media-preview"></div><nav class="preview-navigation"><button class="btn" id="previewPrev">← Anterior</button><span id="previewPage" role="status"></span><button class="btn" id="previewNext">Próxima →</button></nav></div></div>
+<div class="modal" id="renameModal" role="dialog" aria-modal="true" aria-labelledby="renameHeading"><form class="modal-card rename-card" id="renameForm" novalidate><button type="button" class="modal-x" aria-label="Fechar">×</button><span class="eyebrow">ORGANIZAR CONTEÚDO</span><h2 id="renameHeading">Renomear arquivo</h2><p class="hint" id="renameHelp">Digite o novo nome e clique em Salvar nome. O arquivo e a programação são preservados.</p><div class="rename-current"><span>Nome atual</span><b id="renameCurrent"></b></div><label class="field" for="renameTitle">Novo nome<span id="renameCount">0/120</span><input id="renameTitle" name="title" class="input" required maxlength="120" autocomplete="off" aria-describedby="renameHelp renameError"></label><p id="renameError" class="form-error" role="alert"></p><div class="dialog-actions"><button type="button" class="btn" id="cancelRename">Cancelar</button><button class="btn primary" id="saveRename" type="submit">Salvar nome</button></div></form></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>globalThis.StageAuth=<?=json_encode(['csrf'=>csrf_token(),'user'=>$user,'panel'=>true],JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT)?>;</script>
 <script src="assets/timeline.js?v=<?=filemtime(__DIR__.'/assets/timeline.js')?>"></script>

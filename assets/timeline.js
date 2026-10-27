@@ -1,6 +1,7 @@
 (function(root){
  'use strict';
- function activeItems(state,now){return state.items.filter(it=>it.enabled&&!it.archivedAt&&it.type!=='url'&&(!it.startsAtMs||it.startsAtMs<=now)&&(!it.endsAtMs||it.endsAtMs>now))}
+ function periodActive(it,now){const hour=new Date(now-3*3600000).getUTCHours();return it.dayPeriod==='morning'?hour>=6&&hour<12:it.dayPeriod==='afternoon'?hour>=12&&hour<18:it.dayPeriod==='night'?hour>=18||hour<6:true}
+ function activeItems(state,now){return state.items.filter(it=>it.enabled&&!it.archivedAt&&it.type!=='url'&&periodActive(it,now)&&(!it.startsAtMs||it.startsAtMs<=now)&&(!it.endsAtMs||it.endsAtMs>now))}
  function pageCount(it){return Math.max(1,it.pages?.length||0)}
  function duration(it){return Math.max(it.type==='video'?.001:1,Number(it.duration)||10)*1000}
  function resolve(state,now){
@@ -17,6 +18,6 @@
   }
   return {item:null,page:0,offsetMs:0,progress:0};
  }
- root.StageTimeline={resolve,activeItems,pageCount};
+ root.StageTimeline={resolve,activeItems,pageCount,periodActive};
  if(typeof module!=='undefined')module.exports=root.StageTimeline;
 })(typeof globalThis!=='undefined'?globalThis:this);

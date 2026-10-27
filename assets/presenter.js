@@ -23,9 +23,37 @@ function renderLive(){
   $('#standbyButton').setAttribute('aria-label',$('#standbyButton').title);
  }
  $$('[data-cmd]').forEach(b=>{const cmd=b.dataset.cmd;b.disabled=busy||(!it&&['play','pause','next','prev'].includes(cmd));if(cmd==='blackout')b.setAttribute('aria-pressed',String(!!p.blackout));else b.removeAttribute('aria-pressed')});
- $$('.item').forEach(el=>{const current=el.dataset.id===it?.id;el.classList.toggle('playing',current);const item=state.items.find(x=>x.id===el.dataset.id),status=el.querySelector('.item-status');if(status)status.textContent=current?'No ar':item?.startsAtMs>sync.now()?'Agendado':item?.endsAtMs&&item.endsAtMs<=sync.now()?'Validade encerrada':'Na fila'});
+ $$('.item').forEach(el=>{const current=el.dataset.id===it?.id;el.classList.toggle('playing',current);const item=state.items.find(x=>x.id===el.dataset.id),status=el.querySelector('.item-status');if(status)status.textContent=current?'No ar':item?.startsAtMs>sync.now()?'Agendado':item?.endsAtMs&&item.endsAtMs<=sync.now()?'Validade encerrada':item&&!StageTimeline.periodActive(item,sync.now())?'Aguardando período':item?.enabled===false?'Desativado':'Na fila'});
 }
 function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function periodName(value){return ({all:'Todos os horários',morning:'Manhã · 06h às 12h',afternoon:'Tarde · 12h às 18h',night:'Noite · 18h às 06h'})[value]||'Todos os horários'}
+let previewItem=null,previewIndex=0;
+async function openPreview(id){
+ if(dirty)await save();
+ let item=state.items.find(it=>it.id===id);
+ if(item.type==='pdf'&&!item.pages?.length){const fd=new FormData();fd.append('id',id);toast('Preparando páginas para visualizar…');await api('prepare',{method:'POST',body:fd});item=state.items.find(it=>it.id===id)}
+ previewItem=item;previewIndex=0;renderPreview();modal('#mediaModal');$('#mediaModal .modal-x').focus();
+}
+function renderPreview(){
+ const it=previewItem,box=$('#mediaPreview');box.replaceChildren();$('#mediaTitle').textContent=it.title;
+ let node;
+ if(it.pages?.length||it.type==='image'){node=document.createElement('img');node.src=it.pages?.[previewIndex]||it.src;node.alt=it.title+' — página '+(previewIndex+1)}
+ else if(['video','audio'].includes(it.type)){node=document.createElement(it.type);node.src=it.src;node.controls=true;node.preload='metadata'}
+ else{node=document.createElement('p');node.className='preview-text';node.textContent=it.text||'A prévia deste arquivo ainda não está disponível.'}
+ box.appendChild(node);const count=Math.max(1,it.pages?.length||0);$('#previewPage').textContent=`Página ${previewIndex+1} de ${count}`;$('#previewPrev').disabled=previewIndex===0;$('#previewNext').disabled=previewIndex>=count-1;
+}
+$('#previewPrev').onclick=()=>{if(previewIndex>0){previewIndex--;renderPreview()}};
+$('#previewNext').onclick=()=>{if(previewIndex+1<(previewItem?.pages?.length||0)){previewIndex++;renderPreview()}};
+$('#cancelRename').onclick=()=>modal('#renameModal',false);
+$('#renameTitle').oninput=()=>{$('#renameError').textContent='';$('#renameTitle').removeAttribute('aria-invalid');$('#renameCount').textContent=$('#renameTitle').value.length+'/120'};
+$('#renameForm').onsubmit=event=>{event.preventDefault();run(async()=>{
+ const title=$('#renameTitle').value.trim(),input=$('#renameTitle'),button=$('#saveRename');
+ if(!title||title.length>120){$('#renameError').textContent='Digite um nome de 1 a 120 caracteres.';input.setAttribute('aria-invalid','true');input.focus();return}
+ button.disabled=true;button.textContent='Salvando…';
+ try{if(dirty)await save();const fd=new FormData();fd.append('id',$('#renameForm').dataset.id);fd.append('title',title);await api('rename',{method:'POST',body:fd});modal('#renameModal',false);toast('Nome atualizado.');}
+ catch(error){$('#renameError').textContent=error.message||'Não foi possível salvar. Tente novamente.';input.focus()}
+ finally{button.disabled=false;button.textContent='Salvar nome'}
+})};
 function typeName(t){return({image:'Imagem',video:'Vídeo',audio:'Áudio',pdf:'PDF',presentation:'Apresenta\u00e7\u00e3o',text:'Texto'})[t]||t}
 function render(){
  renderedVersion=state.version;
@@ -54,17 +82,14 @@ async function repairVideoDurations(){
  try{const duration=await readVideoDuration(item.src);const fd=new FormData();fd.append('id',item.id);fd.append('duration',duration);await api('video_duration',{method:'POST',body:fd})}
  catch(error){toast(item.title+': '+error.message)}finally{checkingVideo=false;repairVideoDurations()}
 }
-function mediaActions(){return `<button class="btn small rename-item">Renomear</button>${globalThis.StageAuth?.user?.role==='admin'?'<button class="btn small danger purge-item">Apagar definitivamente</button>':''}`}
+function mediaActions(archived=false){return `<button class="btn small preview-item">Visualizar arquivo</button>${archived?purgeAction():'<button class="btn small archive-item">Arquivar arquivo</button>'}`}
+function purgeAction(){return globalThis.StageAuth?.user?.role==='admin'?'<button class="btn small danger purge-item">Apagar definitivamente</button>':''}
 function bindMediaActions(){
- $$('.rename-item').forEach(button=>button.onclick=()=>run(async()=>{
+ $$('.preview-item').forEach(button=>button.onclick=()=>run(()=>openPreview(button.closest('[data-id]').dataset.id)));
+ $$('.rename-item').forEach(button=>button.onclick=()=>{
   const id=button.closest('[data-id]').dataset.id,item=state.items.find(it=>it.id===id);
-  const title=prompt('Nome exibido na fila e nos arquivados (até 120 caracteres):',item.title);
-  if(title===null)return;
-  if(!title.trim()||title.trim().length>120)throw new Error('Informe um nome com 1 a 120 caracteres.');
-  if(dirty)await save();
-  const fd=new FormData();fd.append('id',id);fd.append('title',title);
-  await api('rename',{method:'POST',body:fd});toast('Nome atualizado.');
- }));
+  $('#renameForm').dataset.id=id;$('#renameTitle').value=item.title;$('#renameCurrent').textContent=item.title;$('#renameError').textContent='';$('#renameTitle').removeAttribute('aria-invalid');$('#renameCount').textContent=item.title.length+'/120';modal('#renameModal');$('#renameTitle').focus();$('#renameTitle').select();
+ });
  $$('.purge-item').forEach(button=>button.onclick=()=>run(async()=>{
   const id=button.closest('[data-id]').dataset.id,item=state.items.find(it=>it.id===id);
   if(!confirm(`Apagar definitivamente “${item.title}”? O arquivo e suas páginas serão excluídos e o item sairá da programação. Esta ação não pode ser desfeita.`))return;
@@ -80,14 +105,14 @@ function renderQueue(){
  const thumbnail=it=>{const src=it.pages?.[0]||(it.type==='image'?it.src:null);return src?`<img class="queue-thumb" src="${esc(src)}" alt="" loading="lazy">`:`<span class="queue-thumb file-icon" aria-hidden="true">${it.type==='video'?'\u25b6':it.type==='audio'?'\u266b':'T'}</span>`};
  list.innerHTML=active.length?active.map((it,i)=>`
  <article class="item queue-card" draggable="true" data-id="${esc(it.id)}" data-title="${esc(it.title.toLowerCase())}">
-  <div class="queue-card-top"><span class="queue-index">${i+1}</span>${thumbnail(it)}<div class="item-title"><b title="${esc(it.title)}">${esc(it.title)}</b><small>${typeName(it.type)}${it.pages?.length?' / '+it.pages.length+' p\u00e1ginas':''}${it.renderQuality==='fullhd'?' / Full HD+':''}</small><small class="upload-author">Enviado por ${esc(it.uploadedBy?.name||'Autor n\u00e3o registrado (conte\u00fado antigo)')}</small><span class="item-status"></span></div></div>
+  <div class="queue-card-top"><span class="queue-index">${i+1}</span>${thumbnail(it)}<div class="item-title"><button class="title-rename rename-item" title="Clique para editar o nome" aria-label="Renomear ${esc(it.title)}">${esc(it.title)}<span aria-hidden="true"> ✎</span></button><small>${typeName(it.type)}${it.pages?.length?' / '+it.pages.length+' p\u00e1ginas':''}${it.renderQuality==='fullhd'?' / Full HD+':''}</small><small class="upload-author">Enviado por ${esc(it.uploadedBy?.name||'Autor n\u00e3o registrado (conte\u00fado antigo)')}</small><span class="item-status"></span></div></div>
   <div class="queue-card-actions"><button class="btn small select-item">\u25b6 Exibir agora</button>${mediaActions()}</div>
-  <details ${opened.has(it.id)?'open':''}><summary>Mais opções: ordem, tempo e datas</summary><div class="queue-card-actions"><button class="btn small move-up" ${i===0?'disabled':''} aria-label="Mover para cima">\u2191 Subir</button><button class="btn small move-down" ${i===active.length-1?'disabled':''} aria-label="Mover para baixo">\u2193 Descer</button>${it.type==='presentation'&&it.renderQuality!=='fullhd'?'<button class="btn small quality">Melhorar qualidade</button>':''}<button class="btn small archive-item" title="Remover da fila e guardar nos arquivados">Guardar nos arquivados</button></div><div class="queue-timing"><label>${it.type==='video'?'Dura\u00e7\u00e3o do v\u00eddeo (s)':'Tempo por p\u00e1gina (s)'}<input ${it.type==='video'?'readonly':''} step="any" class="input duration" type="number" min="1" max="86400" value="${Number(it.duration)||10}"></label><label>Intervalo ao terminar (s)<input class="input delay" type="number" min="0" max="3600" value="${Number(it.delay)||0}"></label><span class="queue-total">Total: ${formatDuration((it.duration||10)*Math.max(1,it.pages?.length||0)+(it.delay||0))}</span></div>
-  <div class="queue-schedule"><label>Início<input class="input start" type="datetime-local" value="${esc((scheduleDrafts.get(it.id)||it).startsAt||'')}"></label><label>Fim<input class="input end" type="datetime-local" value="${esc((scheduleDrafts.get(it.id)||it).endsAt||'')}"></label></div><p class="schedule-status hint" role="status">${scheduleDrafts.has(it.id)?'Alterações ainda não salvas.':'Preencha as datas e clique em Salvar. Horário de Brasília.'}</p><div class="schedule-actions"><button class="btn small primary save-schedule">Salvar agendamento</button><button class="btn small cancel-schedule">Cancelar alterações</button></div></details>
+  <details ${opened.has(it.id)?'open':''}><summary>Horários e opções <span class="schedule-badge">${periodName((scheduleDrafts.get(it.id)||it).dayPeriod)}</span></summary><div class="queue-card-actions"><button class="btn small move-up" ${i===0?'disabled':''} aria-label="Mover para cima">\u2191 Subir</button><button class="btn small move-down" ${i===active.length-1?'disabled':''} aria-label="Mover para baixo">\u2193 Descer</button>${it.type==='presentation'&&it.renderQuality!=='fullhd'?'<button class="btn small quality">Melhorar qualidade</button>':''}${purgeAction()}</div><h3 class="option-heading">Tempo de exibição</h3><p class="hint option-help">Defina por quanto tempo o conteúdo aparece na TV. Os tempos são salvos automaticamente.</p><div class="queue-timing"><label>${it.type==='video'?'Dura\u00e7\u00e3o do v\u00eddeo (s)':'Tempo por p\u00e1gina (s)'}<input ${it.type==='video'?'readonly':''} step="any" class="input duration" type="number" min="1" max="86400" value="${Number(it.duration)||10}"></label><label>Intervalo ao terminar (s)<input class="input delay" type="number" min="0" max="3600" value="${Number(it.delay)||0}"></label><span class="queue-total">Total: ${formatDuration((it.duration||10)*Math.max(1,it.pages?.length||0)+(it.delay||0))}</span></div>
+  <div class="schedule-heading"><b>Agendamento diário</b><span>Horário de Brasília</span></div><p class="hint option-help">Escolha um período. Deixe início e fim em branco para repetir todos os dias.</p><label class="field period-field">Período<select class="input day-period">${['all','morning','afternoon','night'].map(value=>`<option value="${value}" ${((scheduleDrafts.get(it.id)||it).dayPeriod||'all')===value?'selected':''}>${periodName(value)}</option>`).join('')}</select></label><div class="queue-schedule"><label>Início (opcional)<input class="input start" type="datetime-local" value="${esc((scheduleDrafts.get(it.id)||it).startsAt||'')}"></label><label>Fim (opcional)<input class="input end" type="datetime-local" value="${esc((scheduleDrafts.get(it.id)||it).endsAt||'')}"></label></div><p class="schedule-status hint" role="status">${scheduleDrafts.has(it.id)?'Alterações ainda não salvas.':''}</p><div class="schedule-actions"><button class="btn small primary save-schedule">Salvar agendamento</button><button class="btn small cancel-schedule">Cancelar alterações</button></div></details>
  </article>`).join(''):'<div class="dropzone"><b>A fila est\u00e1 vazia</b><span>Adicione conte\u00fado ou recupere um item dos arquivados.</span></div>';
- archive.innerHTML=archived.length?archived.map(it=>`<article class="archived-card" data-id="${esc(it.id)}" data-title="${esc(it.title.toLowerCase())}"><div class="queue-card-top">${thumbnail(it)}<div class="item-title"><b>${esc(it.title)}</b><small>${it.archiveReason==='expired'?'Validade encerrada':'Arquivado manualmente'} / ${new Date(it.archivedAt).toLocaleString('pt-BR')}</small><small>Enviado por ${esc(it.uploadedBy?.name||'Autor n\u00e3o registrado (conte\u00fado antigo)')}</small></div></div><div class="queue-card-actions"><button class="btn small restore-item">Recuperar para a fila</button>${mediaActions()}</div></article>`).join(''):'<div class="dropzone"><b>Nenhum item arquivado</b><span>Os itens removidos ou com validade encerrada aparecer\u00e3o aqui.</span></div>';
+ archive.innerHTML=archived.length?archived.map(it=>`<article class="archived-card" data-id="${esc(it.id)}" data-title="${esc(it.title.toLowerCase())}"><div class="queue-card-top">${thumbnail(it)}<div class="item-title"><button class="title-rename rename-item" title="Clique para editar o nome" aria-label="Renomear ${esc(it.title)}">${esc(it.title)}<span aria-hidden="true"> ✎</span></button><small>${it.archiveReason==='expired'?'Validade encerrada':'Arquivado manualmente'} / ${new Date(it.archivedAt).toLocaleString('pt-BR')}</small><small>Enviado por ${esc(it.uploadedBy?.name||'Autor n\u00e3o registrado (conte\u00fado antigo)')}</small></div></div><div class="queue-card-actions"><button class="btn small restore-item">Recuperar para a fila</button>${mediaActions(true)}</div></article>`).join(''):'<div class="dropzone"><b>Nenhum item arquivado</b><span>Os itens removidos ou com validade encerrada aparecer\u00e3o aqui.</span></div>';
  $('#queueCount').textContent=active.length;$('#archiveCount').textContent=archived.length;
- $('#queueSummary').textContent=active.length+' item(ns) na fila / '+formatDuration(active.reduce((sum,it)=>sum+(it.duration||10)*Math.max(1,it.pages?.length||0)+(it.delay||0),0))+'. A lista se repete automaticamente.';
+ $('#queueSummary').textContent=active.length+' item(ns) na fila / '+formatDuration(active.reduce((sum,it)=>sum+(it.duration||10)*Math.max(1,it.pages?.length||0)+(it.delay||0),0));
  bindMediaActions();bindItems();$$('.restore-item').forEach(b=>b.onclick=()=>run(()=>itemAction('restore',b.closest('.archived-card').dataset.id)));
  filterQueue();list.scrollTop=top;archive.scrollTop=archiveTop;
 }
@@ -127,14 +152,14 @@ function bindItems(){
   el.querySelector('.select-item').onclick=()=>run(()=>select(el.dataset.id));
   el.ondblclick=async e=>{if(e.target.closest('input,button,details,label'))return;await run(()=>select(el.dataset.id))};
   el.querySelectorAll('.duration,.delay').forEach(x=>x.onchange=scheduleSave);
-  const captureSchedule=()=>{scheduleDrafts.set(el.dataset.id,{startsAt:el.querySelector('.start').value,endsAt:el.querySelector('.end').value});el.querySelector('.schedule-status').textContent='Alterações ainda não salvas.'};
-  el.querySelectorAll('.start,.end').forEach(x=>x.oninput=captureSchedule);
+  const captureSchedule=()=>{scheduleDrafts.set(el.dataset.id,{startsAt:el.querySelector('.start').value,endsAt:el.querySelector('.end').value,dayPeriod:el.querySelector('.day-period').value});el.querySelector('.schedule-status').textContent='Alterações ainda não salvas.'};
+  el.querySelectorAll('.start,.end,.day-period').forEach(x=>x.oninput=captureSchedule);
   el.querySelector('.cancel-schedule').onclick=()=>{scheduleDrafts.delete(el.dataset.id);renderQueue()};
   el.querySelector('.save-schedule').onclick=()=>run(async()=>{
    captureSchedule();const draft={...scheduleDrafts.get(el.dataset.id)};
    if(draft.startsAt&&draft.endsAt&&draft.endsAt<=draft.startsAt)throw new Error('O fim deve ser posterior ao início.');
    if(dirty)await save();
-   const fd=new FormData();fd.append('id',el.dataset.id);fd.append('startsAt',draft.startsAt);fd.append('endsAt',draft.endsAt);
+   const fd=new FormData();fd.append('id',el.dataset.id);fd.append('startsAt',draft.startsAt);fd.append('endsAt',draft.endsAt);fd.append('dayPeriod',draft.dayPeriod);
    await api('schedule',{method:'POST',body:fd});scheduleDrafts.delete(el.dataset.id);toast('Agendamento salvo.');
   });
   el.querySelector('.archive-item').onclick=()=>run(()=>itemAction('archive',el.dataset.id));
@@ -165,18 +190,20 @@ async function uploadFiles(list){
 const dz=$('#dropzone');['dragenter','dragover'].forEach(n=>dz.addEventListener(n,e=>{e.preventDefault();dz.classList.add('drag')}));
 ['dragleave','drop'].forEach(n=>dz.addEventListener(n,e=>{e.preventDefault();dz.classList.remove('drag')}));
 dz.ondrop=e=>run(()=>uploadFiles(e.dataTransfer.files));
-function modal(id,on=true){$(id).classList.toggle('open',on)}
-$('#textBtn').onclick=()=>{clientEvent('text.open');modal('#textModal')};$$('.modal-x').forEach(x=>x.onclick=()=>x.closest('.modal').classList.remove('open'));
+let modalReturnFocus=null;
+function modal(id,on=true){const el=$(id);if(on)modalReturnFocus=document.activeElement;el.classList.toggle('open',on);document.body.classList.toggle('dialog-open',!!$('.modal.open'));if(!on){if(id==='#mediaModal')$('#mediaPreview').replaceChildren();const trigger=modalReturnFocus;setTimeout(()=>{if(trigger?.isConnected)trigger.focus();else if(id==='#renameModal'){const item=$$('[data-id]').find(x=>x.dataset.id===$('#renameForm').dataset.id);(item?.querySelector('.rename-item')||$('#queueSearch')).focus()}},0)}}
+
+$('#textBtn').onclick=()=>{clientEvent('text.open');modal('#textModal')};$$('.modal-x').forEach(x=>x.onclick=()=>modal('#'+x.closest('.modal').id,false));
 $('#saveText').onclick=()=>run(async()=>{if(!$('#textContent').value.trim())throw new Error('Digite o texto antes de adicionar.');if(dirty)await save();let fd=new FormData();fd.append('title',$('#textTitle').value);fd.append('text',$('#textContent').value);fd.append('duration',$('#textDuration').value);await api('add_text',{method:'POST',body:fd});modal('#textModal',false);$('#textTitle').value='';$('#textContent').value='';await load()});
 $('#logout').onclick=()=>run(async()=>{if(dirty)await save();await api('logout',{method:'POST'});location.reload()});
 async function run(task){
  if(busy){if(task===save)saveTimer=setTimeout(()=>run(save),450);return}busy=true;
- $$('[data-cmd],#saveText,#uploadBtn,.item input,aside input,aside select').forEach(b=>b.disabled=true);
- try{await task()}catch(e){$('#commandStatus').textContent=e.message;toast(e.message||'Não foi possível concluir a operação.')}finally{busy=false;if(state){if(!dirty)render();$$('[data-cmd],#saveText,#uploadBtn,.item input,aside input,aside select').forEach(b=>b.disabled=false);$$('[data-cmd]').forEach(b=>b.disabled=!state.items.length&&['play','pause','next','prev'].includes(b.dataset.cmd))}}
+ $$('[data-cmd],#saveText,#uploadBtn,.item input,.item select,aside input,aside select').forEach(b=>b.disabled=true);
+ try{await task()}catch(e){$('#commandStatus').textContent=e.message;toast(e.message||'Não foi possível concluir a operação.')}finally{busy=false;if(state){if(!dirty)render();$$('[data-cmd],#saveText,#uploadBtn,.item input,.item select,aside input,aside select').forEach(b=>b.disabled=false);$$('[data-cmd]').forEach(b=>b.disabled=!state.items.length&&['play','pause','next','prev'].includes(b.dataset.cmd))}}
 }
 $('#queueTab').onclick=()=>{queueView='active';filterQueue();clientEvent('queue.active')};$('#archiveTab').onclick=()=>{queueView='archive';filterQueue();clientEvent('queue.archived')};let searchLogTimer;$('#queueSearch').oninput=()=>{archivePage=1;filterQueue();clearTimeout(searchLogTimer);searchLogTimer=setTimeout(()=>clientEvent('queue.search',$('#queueSearch').value),700)};
 if($('#openViewer'))$('#openViewer').onclick=()=>clientEvent('viewer.open');
-document.addEventListener('keydown',e=>{if(e.key==='Escape')$$('.modal.open').forEach(m=>m.classList.remove('open'))});
+document.addEventListener('keydown',e=>{const dialog=$('.modal.open');if(!dialog)return;if(e.key==='Escape'){if(busy)return;modal('#'+dialog.id,false)}if(e.key==='Tab'){const controls=[...dialog.querySelectorAll('button:not(:disabled),input:not(:disabled),textarea,select,a[href]')].filter(x=>!x.hidden);const first=controls[0],last=controls[controls.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus()}}});
 setInterval(renderLive,100);sync.start();
 
 function clientEvent(event,value=''){if(!globalThis.StageAuth?.csrf)return;const body=new FormData();body.append('event',event);body.append('value',value);fetch('api.php?action=ui_event',{method:'POST',headers:{'X-CSRF-Token':StageAuth.csrf},body,keepalive:true}).catch(()=>{})}
